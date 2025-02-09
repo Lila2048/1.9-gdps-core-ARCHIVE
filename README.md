@@ -16,6 +16,14 @@ The server software right now is in early beta. I still have many more plans for
 * Automod
 * New webhooks
 
+  ## Known issues
+
+  * Global leaderboard does not work
+  * Weekly leaderboard does not work
+  * Level copying does not work
+ 
+  *These will all be fixed in a future release*
+
 If you would like to contribute to this server, feel free to make a pull request with your changes.
 
 ## 3rd party libraries
