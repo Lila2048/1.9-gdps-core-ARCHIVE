@@ -50,8 +50,8 @@ if($result == 0) {
 
     # Check if account has a linked user
 
-    $sql = $conn->prepare("SELECT COUNT(*) FROM users WHERE udid = :udid");
-    $sql->bindParam(":udid", $udid);
+    $sql = $conn->prepare("SELECT COUNT(*) FROM users WHERE accountID = :accountID");
+    $sql->bindParam(":accountID", $accID);
     $sql->execute();
 
     $udid_check = $sql->fetchColumn();
