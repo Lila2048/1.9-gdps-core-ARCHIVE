@@ -16,7 +16,7 @@ $userString = "";
 # Secret check
 
 if($secret != "Wmfd2893gb7") {
-    die(-1);
+    die("-1");
 }
 
 $sql = $conn->prepare("SELECT * FROM comments WHERE levelID = :levelID LIMIT 5 OFFSET $page2");
@@ -50,7 +50,7 @@ if($commentCount != 0) {
 echo($commentString . "#" . $userString . "#" . $commentCount . ":" . $page2 . ":5");
 
 } else {
-    echo(-2);
+    echo("-2");
 }
 
 ?>

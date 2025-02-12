@@ -3,15 +3,16 @@
 include __DIR__ . "/../incl/lib/connection.php";
 include __DIR__ . "/../incl/lib/gjp.php";
 include __DIR__ . "/../incl/lib/mainLib.php";
+include __DIR__ . "/../incl/lib/exploitPatch.php";
 
 $gjpTools = new gjpTools();
 $ml = new mainLib();
 
 # getting the data from params
 
-$userName = $_POST['userName'];
-$password = $_POST['password'];
-$secret = $_POST['secret'];
+$userName = exploitPatch::clean($_POST['userName']);
+$password = exploitPatch::clean($_POST['password']);
+$secret = exploitPatch::clean($_POST['secret']);
 
 # actual code
 
@@ -25,7 +26,7 @@ $sql->execute();
 $result = $sql->fetchColumn();
 
 if($result != 1) {
-    die(-1);
+    die("-1");
 }
 
 # resolve account ID

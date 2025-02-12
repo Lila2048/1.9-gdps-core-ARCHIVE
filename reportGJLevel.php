@@ -3,17 +3,18 @@
 include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/DiscordWebhook.php";
 include __DIR__ . "/config/webhooks.php";
+include __DIR__ . "/incl/lib/exploitPatch.php";
 
 # getting data
 
-$levelID = $_POST['levelID'];
-$secret = $_POST['secret'];
-$ip = $ip = $_SERVER['REMOTE_ADDR'];
+$levelID = exploitPatch::clean($_POST['levelID']);
+$secret = exploitPatch::clean($_POST['secret']);
+$ip = $_SERVER['REMOTE_ADDR'];
 
 $dw = new DiscordWebhook($levelReportWebhook);
 
 if($secret != "Wmfd2893gb7") {
-    die(-1);
+    die("-1");
 }
 
 # anti spam measure as no credentials are passed in
@@ -26,7 +27,7 @@ $sql->execute();
 $result = $sql->fetchColumn();
 
 if($result != 0) {
-    die(-1);
+    die("1");
 }
 
 $sql = $conn->prepare("INSERT INTO reports (levelID, ip, timestamp) VALUES (:levelID, :ip, UNIX_TIMESTAMP())");

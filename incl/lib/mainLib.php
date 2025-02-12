@@ -449,6 +449,26 @@
                 return 0;
             }
         }
+
+        public function checkBanState($userID, $banType) {
+            require __DIR__ . "/connection.php";
+            $sql = $conn->prepare("SELECT COUNT(*) FROM bans WHERE user = :userID AND banType = :banType AND expires > UNIX_TIMESTAMP() ORDER BY timestamp LIMIT 1");
+            $sql->execute(['userID' => $userID, ':banType' => $banType]);
+            $result = $sql->fetchColumn();
+            if($result == 0) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+
+        public function getUserID($udid) {
+            require __DIR__ . "/connection.php";
+            $sql = $conn->prepare("SELECT userID FROM users WHERE udid = :udid");
+            $sql->execute([':udid' => $udid]);
+            $result = $sql->fetchColumn();
+            return $result;
+        }
     }
 
 ?>

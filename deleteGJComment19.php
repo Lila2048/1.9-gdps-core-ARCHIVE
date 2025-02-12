@@ -21,8 +21,7 @@ $sql->execute([':commentID' => $commentID]);
 $result = $sql->fetchColumn();
 
 if($result != $udid) {
-    echo(-1);
-    die();
+    die("-1");
 }
 
 # delete comment

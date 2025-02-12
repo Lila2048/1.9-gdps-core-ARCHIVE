@@ -1,18 +1,19 @@
 <?php
 
 include __DIR__ . "/incl/lib/connection.php";
+include __DIR__ . "/incl/lib/exploitPatch.php";
 
-$itemID = $_POST['itemID'];
-$like = $_POST['like'];
-$type = $_POST['type'];
-$secret = $_POST['secret'];
-$ip = $ip = $_SERVER['REMOTE_ADDR'];
+$itemID = exploitPatch::clean($_POST['itemID']);
+$like = exploitPatch::clean($_POST['like']);
+$type = exploitpatch::clean($_POST['type']);
+$secret = exploitPatch::clean($_POST['secret']);
+$ip = $_SERVER['REMOTE_ADDR'];
 $timestamp = time();
 
 # almost forgot to do secret check lol
 
 if($secret != "Wmfd2893gb7") {
-    exit(-1);
+    exit("-1");
 }
 
 switch($type) {
@@ -68,7 +69,6 @@ switch($type) {
 
             $sql = $conn->prepare("INSERT INTO actions_likes (itemID, type, isLike, ip, timestamp) VALUES (:itemID, :type, :isLike, :ip, :timestamp)");
             $sql->execute([':itemID' => $itemID, ':type' => $type, ':isLike' => $like, ':ip' => $ip, ':timestamp' => $timestamp]);
-            echo(1);
         }
         break;
     case 2:

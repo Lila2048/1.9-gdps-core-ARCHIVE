@@ -23,6 +23,7 @@
             <li>Force Change Username</li>
             <li>Force Change Email</li>
             <li>Rate level</li>
+            <li><a href="admin/runCron.php">Run Cron</a></li>
         </ul>
     </body>
 </html>

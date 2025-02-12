@@ -6,9 +6,9 @@ if(isset($_POST['password'], $_POST['username'], $_POST['newUsername'])) {
 
     $ml = new MainLib();
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $newUsername = $_POST['newUsername'];
+    $username = exploitPatch::clean($_POST['username']);
+    $password = exploitPatch::clean($_POST['password']);
+    $newUsername = exploitPatch::clean($_POST['newUsername']);
 
     $authState = $ml->checkAuthentication($username, $password);
 

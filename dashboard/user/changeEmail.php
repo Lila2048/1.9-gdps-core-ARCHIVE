@@ -3,12 +3,13 @@
 if(isset($_POST['password'], $_POST['username'], $_POST['newEmail'])) {
     include __DIR__ . "/../../incl/lib/connection.php";
     include __DIR__ . "/../../incl/lib/mainLib.php";
+    include __DIR__ . "/../../incl/lib/exploitPatch.php";
 
     $ml = new MainLib();
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $newEmail = $_POST['newEmail'];
+    $username = exploitPatch::clean($_POST['username']);
+    $password = exploitPatch::clean($_POST['password']);
+    $newEmail = exploitPatch::clean($_POST['newEmail']);
 
     $authState = $ml->checkAuthentication($username, $password);
 

@@ -24,7 +24,7 @@ if($ratedLevelDeletes == false) {
 # secret check
 
 if($secret != "Wmfv2898gc9") {
-    die(-1);
+    die("-1");
 }
 
 $sql = $conn->prepare("SELECT COUNT(*) FROM levels WHERE udid = :udid AND levelID = :levelID");

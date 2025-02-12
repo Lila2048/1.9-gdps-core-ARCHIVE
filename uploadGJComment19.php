@@ -3,16 +3,17 @@
 include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/mainLib.php";
 include __DIR__ . "/incl/lib/commands.php";
+include __DIR__ . "/incl/lib/exploitPatch.php";
 
 # getting data
 
-$udid = $_POST['udid'];
-$accountID = $_POST['accountID'];
-$userName = $_POST['userName'];
-$levelID = $_POST['levelID'];
-$comment = base64_encode($_POST['comment']);
-$commentRaw = $_POST['comment'];
-$secret = $_POST['secret'];
+$udid = exploitPatch::clean($_POST['udid']);
+$accountID = exploitPatch::clean($_POST['accountID']);
+$userName = exploitPatch::clean($_POST['userName']);
+$levelID = exploitPatch::clean($_POST['levelID']);
+$comment = base64_encode(exploitPatch::clean($_POST['comment']));
+$commentRaw = exploitPatch::clean($_POST['comment']);
+$secret = exploitPatch::clean($_POST['secret']);
 $ip = $ip = $_SERVER['REMOTE_ADDR'];
 $timestamp = time();
 
@@ -22,7 +23,16 @@ $cmds = new commands();
 # secret check
 
 if($secret  != "Wmfd2893gb7") {
-    die(-1);
+    die("-1");
+}
+
+# check ban status
+
+$userID = $ml->getUserID($udid);
+$isBanned = $ml->checkBanState($userID, 3);
+
+if($isBanned == 1) {
+    die("-3");
 }
 
 # check if comment is a command

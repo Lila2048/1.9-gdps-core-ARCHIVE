@@ -13,6 +13,10 @@
     $userString = "";
     $index = 0;
 
+    if($secret != "Wmfd2893gb7") {
+        die("-1");
+    }
+
     if($type == "top") {
 
         # top 100

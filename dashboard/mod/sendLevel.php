@@ -4,14 +4,15 @@ if(isset($_POST['username'], $_POST['password'])) {
     # check auth
     include __DIR__ . "/../../incl/lib/connection.php";
     include __DIR__ . "/../../incl/lib/mainLib.php";
+    include __DIR__ . "/../../incl/lib/exploitPatch.php";
 
     $ml = new MainLib();
 
-    $userName = $_POST['username'];
-    $password = $_POST['password'];
-    $stars = $_POST['stars'];
-    $levelID = $_POST['levelID'];
-    $feature = $_POST['feature'];
+    $userName = exploitPatch::clean($_POST['username']);
+    $password = exploitPatch::clean($_POST['password']);
+    $stars = exploitPatch::clean($_POST['stars']);
+    $levelID = exploitPatch::clean($_POST['levelID']);
+    $feature = exploitPatch::clean($_POST['feature']);
 
     $accountID = $ml->getAccountID($userName, $password);
     $udid = $ml->getUDIDFromAccountID($accountID);

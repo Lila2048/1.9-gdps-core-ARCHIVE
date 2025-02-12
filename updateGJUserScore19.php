@@ -2,24 +2,30 @@
 
 include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/mainLib.php";
+include __DIR__ . "/incl/lib/exploitPatch.php";
 
 # Getting all the data
 
-$udid = $_POST['udid'];
-$accountID = $_POST['accountID'];
-$userName = $_POST['userName'];
-$stars = $_POST['stars'];
-$demons = $_POST['demons'];
-$icon = $_POST['icon'];
-$color1 = $_POST['color1'];
-$color2 = $_POST['color2'];
-$iconType = $_POST['iconType'];
-$coins = $_POST['coins'];
-$special = $_POST['special'];
-$gameVersion = $_POST['gameVersion'];
+$udid = exploitPatch::clean($_POST['udid']);
+$accountID = exploitPatch::clean($_POST['accountID']);
+$userName = exploitPatch::clean($_POST['userName']);
+$stars = exploitPatch::clean($_POST['stars']);
+$demons = exploitPatch::clean($_POST['demons']);
+$icon = exploitPatch::clean($_POST['icon']);
+$color1 = exploitPatch::clean($_POST['color1']);
+$color2 = exploitPatch::clean($_POST['color2']);
+$iconType = exploitPatch::clean($_POST['iconType']);
+$coins = exploitPatch::clean($_POST['coins']);
+$special = exploitPatch::clean($_POST['special']);
+$gameVersion = exploitPatch::clean($_POST['gameVersion']);
+$secret = exploitPatch::clean($_POST['secret']);
 $time = time();
 
 $ml = new mainLib();
+
+if($secret != "Wmfd2893gb7") {
+    die("-1");
+}
 
 # checking if player data is in the db already
 
@@ -65,6 +71,6 @@ $userID = $sql->fetchColumn();
 
 echo($userID);
 
-$ml->logAction(7, $udid, $accountID, $userName);
+$ml->logAction(7, $userID, $stars, $demons, $coins);
 
 ?>

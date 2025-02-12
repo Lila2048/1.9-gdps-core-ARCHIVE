@@ -3,6 +3,7 @@
 include __DIR__ . "/../incl/lib/connection.php";
 include __DIR__ . "/../incl/lib/gjp.php";
 include __DIR__ . "/../incl/lib/mainLib.php";
+include __DIR__ . "/../incl/lib/exploitPatch.php";
 
 $gjpTools = new gjpTools();
 $ml = new MainLib();
@@ -11,17 +12,17 @@ $ml = new MainLib();
 
 # Gathering data
 
-$udid = $_POST['udid'];
-$userName = $_POST['userName'];
-$passRaw = $_POST['password'];
-$secret = $_POST['secret'];
+$udid = exploitPatch::clean($_POST['udid']);
+$userName = exploitPatch::clean($_POST['userName']);
+$passRaw = exploitPatch::clean($_POST['password']);
+$secret = exploitPatch::clean($_POST['secret']);
 $time = time();
 $ip = $_SERVER['REMOTE_ADDR'];
 
 # Secret check
 
 if($secret != "Wmfv3899gc9") {
-    die(-1);
+    die("-1");
 }
 
 # Checking authentication
@@ -36,7 +37,7 @@ $sql->execute();
 $result = $sql->fetchColumn();
 
 if($result == 0) {
-    die(-11);
+    die("-11");
 } else {
 
     # check account ID

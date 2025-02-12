@@ -15,7 +15,7 @@ $packString = "";
 # secret check
 
 if($secret != "Wmfd2893gb7") {
-    die(-1);
+    die("-1");
 }
 
 # actual code

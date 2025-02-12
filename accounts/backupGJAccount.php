@@ -3,16 +3,17 @@
 include __DIR__ . "/../incl/lib/connection.php";
 include __DIR__ . "/../incl/lib/gjp.php";
 include __DIR__ . "/../incl/lib/mainLib.php";
+include __DIR__ . "/../incl/lib/exploitPatch.php";
 
 $gjpTools = new gjpTools();
 $ml = new MainLib();
 
 # Gathering data
 
-$userName = $_POST['userName'];
-$password = $_POST['password'];
+$userName = exploitPatch::clean($_POST['userName']);
+$password = exploitPatch::clean($_POST['password']);
 $saveData = $_POST['saveData'];
-$secret = $_POST['secret'];
+$secret = exploitPatch::clean($_POST['secret']);
 
 # Large file spam prevention
 
@@ -32,7 +33,7 @@ $sql->execute();
 $result = $sql->fetchColumn();
 
 if($result != 1) {
-    die(-1);
+    die("-1");
 }
 
 # Find account ID

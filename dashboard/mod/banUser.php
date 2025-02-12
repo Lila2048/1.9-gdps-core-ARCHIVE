@@ -4,15 +4,16 @@ if(isset($_POST['userName'], $_POST['password'])) {
 
 include __DIR__ . "/../../incl/lib/connection.php";
 include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/exploitPatch.php";
 
 $ml = new mainLib();
 
-$userName = $_POST['userName'];
-$password = $_POST['password'];
-$banType = $_POST['banType'];
-$targetID = $_POST['targetID'];
-$expires = $_POST['expires'];
-$reason = base64_encode($_POST['reason']);
+$userName = exploitPatch::clean($_POST['userName']);
+$password = exploitPatch::clean($_POST['password']);
+$banType = exploitPatch::clean($_POST['banType']);
+$targetID = exploitPatch::clean($_POST['targetID']);
+$expires = exploitPatch::clean($_POST['expires']);
+$reason = base64_encode(exploitPatch::clean($_POST['reason']));
 
 if($expires == 0) {
     $expires = 2147483647;
@@ -73,7 +74,6 @@ function displayForm() {
             <br>
             <label for='banType'>Ban Type:</label>
             <select id='banType' name='banType' required>
-                <option value='account'>Account</option>
                 <option value='uploading'>Uploading Levels</option>
                 <option value='commenting'>Commenting</option>
                 <option value='creatorsLB'>Top Creators</option>

@@ -4,12 +4,13 @@ include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/DiscordWebhook.php";
 include __DIR__ . "/config/webhooks.php";
 include __DIR__ . "/incl/lib/mainLib.php";
+include __DIR__ . "/incl/lib/exploitPatch.php";
 
 $dw = new DiscordWebhook($userRateWebhook);
 
-$levelID = $_POST['levelID'];
-$rating = $_POST['rating'];
-$secret = $_POST['secret'];
+$levelID = exploitPatch::clean($_POST['levelID']);
+$rating = exploitPatch::clean($_POST['rating']);
+$secret = exploitPatch::clean($_POST['secret']);
 $ip = $_SERVER['REMOTE_ADDR'];
 
 $ml = new MainLib();
@@ -28,7 +29,7 @@ $sql->execute([':value1' => $levelID, ':ip' => $ip]);
 $count = $sql->fetchColumn();
 
 if($count != 0) {
-    die(1);
+    die("1");
 }
 
 # send webhook

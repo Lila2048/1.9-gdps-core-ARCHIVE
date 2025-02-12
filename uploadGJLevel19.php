@@ -3,6 +3,7 @@
 include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/mainLib.php";
 include __DIR__ . "/config/main.php";
+include __DIR__ . "/incl/lib/exploitPatch.php";
 
 $ml = new MainLib();
 
@@ -12,29 +13,40 @@ ini_set("upload_max_filesize","50M");
 
 # Gathering information
 
-$udid = $_POST['udid'];
-$accountID = $_POST['accountID'];
-$userName = $_POST['userName'];
-$levelID = $_POST['levelID'];
-$levelName = $_POST['levelName'];
-$levelDesc = base64_encode($_POST['levelDesc']);
-$levelVersion = $_POST['levelVersion'];
-$levelLength = $_POST['levelLength'];
-$audioTrack = $_POST['levelLength'];
-$gameVersion = $_POST['gameVersion'];
-$password = $_POST['password'];
-$original = $_POST['original'];
-$twoPlayer = $_POST['twoPlayer'];
-$songID = $_POST['songID'];
-$objects = $_POST['objects'];
-$extraString = $_POST['extraString'];
-$levelString = $_POST['levelString'];
-$levelReplay = $_POST['levelReplay']; # :p
-$secret = $_POST['secret'];
+$udid = exploitPatch::clean($_POST['udid']);
+$accountID = exploitPatch::clean($_POST['accountID']);
+$userName = exploitPatch::clean($_POST['userName']);
+$levelID = exploitPatch::clean($_POST['levelID']);
+$levelName = exploitPatch::clean($_POST['levelName']);
+$levelDesc = base64_encode(exploitPatch::clean($_POST['levelDesc']));
+$levelVersion = exploitPatch::clean($_POST['levelVersion']);
+$levelLength = exploitPatch::clean($_POST['levelLength']);
+$audioTrack = exploitPatch::clean($_POST['audioTrack']);
+$gameVersion = exploitPatch::clean($_POST['gameVersion']);
+$password = exploitPatch::clean($_POST['password']);
+$original = exploitPatch::clean($_POST['original']);
+$twoPlayer = exploitPatch::clean($_POST['twoPlayer']);
+$songID = exploitPatch::clean($_POST['songID']);
+$objects = exploitPatch::clean($_POST['objects']);
+$extraString = exploitPatch::clean($_POST['extraString']);
+$levelString = exploitPatch::clean($_POST['levelString']);
+$levelReplay = exploitPatch::clean($_POST['levelReplay']);
+$secret = exploitPatch::clean($_POST['secret']);
 $ip = $_SERVER['REMOTE_ADDR'];
 $uploadDate = time();
 
 # wow thats a lot
+
+$placedID = "";
+
+# check ban
+
+$userID = $ml->getUserID($udid);
+$banState = $ml->checkBanState($userID, 2);
+
+if($banState == 1) {
+    die("-1");
+}
 
 # rate limit check
 
@@ -44,7 +56,7 @@ $sql->execute(['ip' => $ip]);
 $result = $sql->fetchColumn();
 
 if($result > time() - $levelUploadTime) {
-    echo(-1);
+    echo("-1");
     die();
 }
 
@@ -84,19 +96,42 @@ $sql->bindParam(":userID", $userID);
 
 $sql->execute();
 
-} else {
-    die(-1);
-}
+$placedID = $conn->lastInsertId();
+file_put_contents(__DIR__ . "/data/levels/" . $placedID, $levelString);
+echo($placedID);
 
-if($levelID == 0) {
-    # new level
-    $placedID = $conn->lastInsertId();
-    file_put_contents(__DIR__ . "/data/levels/" . $placedID, $levelString);
-    echo($placedID);
 } else {
-    # updating level
+    # update level
+
+    $levelInfo = $ml->getLevelInfo($levelID);
+
+    if($levelInfo['udid'] != $udid) {
+        die("-1");
+    } else {
+
+    $sql = $conn->prepare("UPDATE levels SET gameVersion = :gameVersion, levelDesc = :levelDesc, levelVersion = :levelVersion, levelLength = :levelLength, audioTrack = :audioTrack, password = :password, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, extraString = :extraString, levelReplay = :levelReplay, updateDate = UNIX_TIMESTAMP(), ip = :ip, userName = :userName WHERE levelID = :levelID");
+
+    $sql->bindParam(":gameVersion", $gameVersion);
+    $sql->bindParam(":levelDesc", $levelDesc);
+    $sql->bindParam(":levelVersion", $levelVersion);
+    $sql->bindParam(":levelLength", $levelLength);
+    $sql->bindParam(":audioTrack", $audioTrack);
+    $sql->bindParam(":password", $password);
+    $sql->bindParam(":original", $original);
+    $sql->bindParam(":twoPlayer", $twoPlayer);
+    $sql->bindParam(":songID", $songID);
+    $sql->bindParam(":objects", $objects);
+    $sql->bindParam(":extraString", $extraString);
+    $sql->bindParam(":levelReplay", $levelReplay);
+    $sql->bindParam(":ip", $ip);
+    $sql->bindParam(":userName", $userName);
+    $sql->bindParam(":levelID", $levelID);
+
+    $sql->execute();
+
     file_put_contents(__DIR__ . "/data/levels/" . $levelID, $levelString);
     echo($levelID);
+    }
 }
 
 $ml->logAction(9, $placedID, $udid, $userID);

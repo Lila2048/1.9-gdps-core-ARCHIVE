@@ -20,6 +20,35 @@ $twoPlayer = $_POST['twoPlayer'];
 $gameVersion = $_POST['gameVersion'];
 $secret = $_POST['secret'];
 
+# setting misc params
+
+$completedLevels = "";
+$noStar = "";
+$star = "";
+$song = "";
+$isNGSong = false;
+
+# optional params
+
+if(isset($_POST['completedLevels'])) {
+    $completedLevels = $_POST['completedLevels'];
+}
+
+if(isset($_POST['noStar'])) {
+    $noStar = $_POST['noStar'];
+}
+
+if(isset($_POST['star'])) {
+    $star = $_POST['star'];
+}
+
+if(isset($_POST['song'])) {
+    $song = $_POST['song'];
+    if(isset($_POST['customSong'])) {
+        $isNGSong = true;
+    }
+}
+
 $trendingTime = time() - 604800;
 
 $page2 = $page * 10;
@@ -28,15 +57,17 @@ $index = $page2 + 1;
 # Secret check
 
 if($secret != "Wmfd2893gb7") {
-    die(-1);
+    die("-1");
 }
 
-$queryString = "SELECT * FROM levels "; # var for the query builder
+$queryStringStart = "SELECT * FROM levels "; # var for the query builder
 $levelString = ""; # level string to return to the client
 $songString = "";
 $creatorsString = "";
 $extra = 0; # logic for level count query, used by types that filter
-$queryString2 = "LIMIT 10 OFFSET :page2";
+$queryString2 = "LIMIT 10 OFFSET $page2";
+$orderString = "";
+$queryString = "";
 
 # Actual code
 
@@ -46,64 +77,117 @@ switch($type) {
     case 0:
         # name search
         if(!is_numeric($str)) {
-        $queryString .= "WHERE levelName LIKE :str ";
-        $str = "%$str%";
+            $str = "%$str%";
+            $queryString .= "WHERE levelName LIKE $str ";
         } else {
-            $queryString .= "WHERE levelID = :str ";
+            $queryString .= "WHERE levelID = $str ";
         }
+        $orderString .= "ORDER BY likes DESC ";
         break;
     case 1: # most downloaded
-        $queryString .= "ORDER BY downloads DESC ";
+        $queryString .= "WHERE 1 ";
+        $orderString .= "ORDER BY downloads DESC ";
         break;
     case 2: # most liked
-        $queryString .= "ORDER BY likes DESC ";
+        $queryString .= "WHERE 1 ";
+        $orderString .= "ORDER BY likes DESC ";
         break;
     case 3: # trending
-        $queryString .= "WHERE uploadDate > :trendingTime ORDER BY likes DESC ";
+        $queryString .= "WHERE uploadDate > $trendingTime ";
+        $orderString .= "ORDER BY likes DESC ";
         $extra = 3;
         break;
     case 4: # recent tab (oh no)
-        $queryString .= "ORDER BY uploadDate DESC ";
+        $queryString .= "WHERE 1 ";
+        $orderString .= "ORDER BY uploadDate DESC ";
         break;
     case 5: # levels by user
         $extra = 5;
-        $queryString .= "WHERE userID = :str ORDER BY uploadDate DESC ";
+        $queryString .= "WHERE userID = $str ";
+        $orderString .= "ORDER BY uploadDate DESC ";
         break;
     case 6: # featured
         $extra = 6;
-        $queryString .= "WHERE featureScore >= 1 ORDER BY rateDate DESC ";
+        $queryString .= "WHERE featureScore >= 1 ";
+        $orderString .= "ORDER BY rateDate DESC ";
         break;
     case 7: # magic tab
         $extra = 7;
-        $queryString .= "WHERE objects > 9999 ORDER by uploadDate AND stars = 0 ";
+        $queryString .= "WHERE objects > 9999 AND stars = 0 ";
+        $orderString .= "ORDER BY uploadDate ";
         break;
     case 10: # map packs
         $extra = 10;
-        $queryString .= "WHERE levelID IN ( $str ) ORDER BY stars DESC";
+        $queryString .= "WHERE levelID IN ($str) ";
+        $orderString .= "ORDER BY stars DESC";
         break;
 }
 
-# diff filters
+# diffs
 
-# add in other values after all else has been accounted for
-
-if($type == 10) {
-    $queryString2 = "";
+switch($diff) {
+    case -1:
+        $queryString .= "AND difficulty = 0 ";
+        break;
+    case -3:
+        $queryString .= "AND auto = 1 ";
+        break;
+    case -2:
+        $queryString .= "AND demon = 1 ";
+        break;
+    case "-":
+        break;
+    default:
+        $diff = str_replace(",", "0,", $diff) . "0";
+        $queryString .= "AND difficulty IN ($diff) AND auto = 0 AND demon = 0 ";
+        break;
 }
 
-$sql = $conn->prepare($queryString . $queryString2);
+# length
 
-if ($type == 0 || $type == 5) {
-    $sql->bindParam(':str', $str);
+if ($len != "-") {
+    $queryString .= "AND levelLength IN ($len) ";
 }
 
-if ($type == 3) {
-    $sql->bindParam(':trendingTime', $trendingTime);
+# misc types
+
+if($original == 1) {
+    $queryString .= "AND original = 0 ";
 }
 
-if($type != 10) {
-$sql->bindParam(':page2', $page2, PDO::PARAM_INT);
+if($uncompleted == "") {
+    $queryString .= "AND levelID NOT IN $completedLevels ";
 }
+
+if($featured == 1) {
+    $queryString .= "AND featureScore > 0 ";
+}
+
+if($twoPlayer == 1) {
+    $queryString .= "AND twoPlayer = 1 ";
+}
+
+if($noStar == 1) {
+    $queryString .= "AND stars = 0 ";
+}
+
+if($star == 1) {
+    $queryString .= "AND stars > 0 ";
+}
+
+if($noStar == 1) {
+    $queryString .= "AND stars = 0 ";
+}
+
+if($song == 1) {
+    if($isNGSong == false) {
+    $queryString .= "AND audioTrack = $song ";
+    } else {
+        $queryString .= "AND songID = $song ";
+    }
+}
+
+$sql = $conn->prepare($queryStringStart . $queryString . $orderString . $queryString2);
 
 $sql->execute();
 
@@ -120,7 +204,7 @@ foreach($result as $level) {
     $levelString .= "1:" . $level['levelID'] . ":2:" . $level['levelName'] . ":3:" . base64_decode($level['levelDesc']) . ":5:" . $level['levelVersion'] . ":6:" . $userID . ":8:10" . ":9:" . $level['difficulty'] . ":10:" . $level['downloads'] . ":12:" . $level['audioTrack'] . ":13:" . $level['gameVersion'] . ":14:" . $level['likes'] . ":15:" . $level['levelLength'] . ":17:" . $level['demon'] . ":18:" . $level['stars'] . ":19:" . $level['featureScore'] . ":25:" . $level['auto'] . ":26:" . $level['levelReplay'] . ":30:" . $level['copiedID'] . ":31:" . $level['twoPlayer'] . ":35:" . $level['songID'] . ":36:" . $level['extraString']. "|";
 
     if($level['songID'] != 0) {
-        $songString .= $ml->getSongInfo($level['songID']) . ":";
+        $songString .= $ml->getSongInfo($level['songID']) . "~:~";
     }
 }
 
@@ -143,35 +227,9 @@ echo($levelString . "#" . $creatorsString . "#" . $songString);
 
 # levels count
 
-switch($extra) {
-    case 0:
-        $query = $conn->prepare("SELECT count(*) FROM levels");
-        $query->execute();
-        $levelCount = $query->fetchColumn();
-        break;
-    case 6:
-        $query = $conn->prepare("SELECT count(*) FROM levels WHERE featureScore >= 1");
-        $query->execute();
-        $levelCount = $query->fetchColumn();
-        break;
-    case 10:
-        $query = $conn->prepare("SELECT count(*) FROM levels WHERE levelID IN (:str)");
-        $query->bindParam(':str', $str);
-        $query->execute();
-        $levelCount = $query->fetchColumn();
-        break;
-    case 3:
-        $query = $conn->prepare("SELECT count(*) FROM levels WHERE uploadDate > :trendingTime");
-        $query->bindParam(':trendingTime', $trendingTime);
-        $query->execute();
-        $levelCount = $query->fetchColumn();
-        break;
-    case 7:
-        $query = $conn->prepare("SELECT count(*) FROM levels WHERE objects > 9999 AND stars = 0");
-        $query->execute();
-        $levelCount = $query->fetchColumn();
-        break;
-}
+$query = $conn->prepare("SELECT count(*) FROM levels " . $queryString . $orderString);
+$query->execute();
+$levelCount = $query->fetchColumn();
 
 echo("#" . $levelCount . ":" . $page2 . ":10");
 
