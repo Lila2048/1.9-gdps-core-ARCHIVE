@@ -1,6 +1,8 @@
 <?php
 
-if(isset($_POST['username'], $_POST['password'])) {
+session_start();
+
+if(isset($_SESSION['username'], $_SESSION['username'])) {
     # check auth
     include __DIR__ . "/../../incl/lib/connection.php";
     include __DIR__ . "/../../incl/lib/mainLib.php";
@@ -8,37 +10,34 @@ if(isset($_POST['username'], $_POST['password'])) {
 
     $ml = new MainLib();
 
-    $userName = exploitPatch::clean($_POST['username']);
-    $password = exploitPatch::clean($_POST['password']);
-    $stars = exploitPatch::clean($_POST['stars']);
-    $levelID = exploitPatch::clean($_POST['levelID']);
-    $feature = exploitPatch::clean($_POST['feature']);
-
-    $accountID = $ml->getAccountID($userName, $password);
+    $accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
     $udid = $ml->getUDIDFromAccountID($accountID);
     $permState = $ml->checkPerms(1, $udid);
 
     if($permState != 1) {
-        displayForm();
-        die("><h1>Missing perms or invalid login!</h1>");
-    } else {
+        die("<h1>Access denied!</h1>");
+    }
+
+    if(isset($_POST['stars'], $_POST['levelID'], $_POST['feature'])) {
+
+        $stars = exploitPatch::clean($_POST['stars']);
+        $levelID = exploitPatch::clean($_POST['levelID']);
+        $feature = exploitPatch::clean($_POST['feature']);
+
         $ml->sendLevel($levelID, $stars, $feature, $udid);
         displayForm();
-        echo("><h1>Level Sent!<h1>");
+        echo("<h1>Level Sent!<h1>");
+
+    } else {
+        displayForm();
     }
+
 } else {
-    # display auth form
-    displayForm();
+    die("<h1>Access denied!</h1>");
 }
 
 function displayForm() {
     echo "<form action='sendLevel.php' method='POST'>
-    <label for='username'>Username:</label>
-    <input type='text' name='username' id='username' required>
-    <br>
-    <label for='password'>Password:</label>
-    <input type='password' name='password' id='password' required>
-    <br>
     <label for='levelID'>levelID:</label>
     <input type='number' name='levelID' id='levelID' min=0 required>
     <br>

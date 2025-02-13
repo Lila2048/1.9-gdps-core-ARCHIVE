@@ -1,44 +1,27 @@
 <?php
 
-if(isset($_POST['username'], $_POST['password'])) {
-    # check auth
-    include __DIR__ . "/../../incl/lib/connection.php";
-    include __DIR__ . "/../../incl/lib/mainLib.php";
-    include __DIR__ . "/../../incl/lib/cron.php";
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/cron.php";
+include __DIR__ . "/../../incl/lib/exploitPatch.php";
 
-    $ml = new MainLib();
+$ml = new mainLib();
 
-    $userName = $_POST['username'];
-    $password = $_POST['password'];
+session_start();
 
-    $accountID = $ml->getAccountID($userName, $password);
-    $udid = $ml->getUDIDFromAccountID($accountID);
-    $permState = $ml->checkPerms(2, $udid);
+if(!isset($_SESSION['username'], $_SESSION['password'])) {
+    die("<h1>Access denied!</h1>");
+}
 
-    if($permState != 1) {
-        displayForm();
-        die("<h1>Missing perms or invalid login!</h1>");
-    } else {
-        cron::refreshSongs();
-        $ml->logAction(14, $userName, $accountID, $udid);
-        displayForm();
-        die("<h1>Cron job complete!</h1>");
-    }
+$accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
+$udid = $ml->getUDIDFromAccountID($accountID);
+$permState = $ml->checkPerms(1, $udid);
+
+if($permState != 1) {
+    die("<h1>Access Denied!</h1>");
 } else {
-    # display auth form
-    displayForm();
+        cron::refreshSongs();
+        $ml->logAction(14, $_SESSION['username'], $accountID, $udid);
+        die("<h1>Cron job complete!</h1>");
 }
-
-function displayForm() {
-    echo "<form action='runCron.php' method='POST'>
-    <label for='username'>Username:</label>
-    <input type='text' name='username' id='username' required>
-    <br>
-    <label for='password'>Password:</label>
-    <input type='password' name='password' id='password' required>
-    <br>
-    <input type='submit'>
-    </form>";
-}
-
 ?>

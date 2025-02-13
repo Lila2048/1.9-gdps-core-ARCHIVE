@@ -1,5 +1,11 @@
 <?php
 
+session_start();
+
+if(!isset($_SESSION['username'], $_SESSION['password'])) {
+    die("<h1>Access denied<h1>");
+}
+
 if(isset($_POST['songName'])) {
 include __DIR__ . "/../../incl/lib/connection.php";
 include __DIR__ . "/../../config/main.php";
@@ -8,8 +14,8 @@ include __DIR__ . "/../../incl/lib/mainLib.php";
 $ml = new mainLib();
 
 $songName = $_POST['songName'];
-$username = $_POST['username'];
-$password = $_POST['password'];
+$username = $_SESSION['username'];
+$password = $_SESSION['password'];
 $songAuthor = $_POST['songAuthor'];
 $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -94,12 +100,6 @@ $sql->execute([':id' => $songID, ':name' => $songName, ':authorName' => $songAut
     <br>
     <label for='songAuthor'>Song Author:</label>
     <input type='text' name='songAuthor' maxlength='15' id='songAuthor' required>
-    <br>
-    <label for='username'>Username:</label>
-    <input type='text' name='username' id='username' required>
-    <br>
-    <label for='password'>Password:</label>
-    <input type='password' name='password' id='password' required>
     <br>
     <input type='submit'>
 </form>";

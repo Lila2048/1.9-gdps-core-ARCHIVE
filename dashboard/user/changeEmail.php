@@ -1,39 +1,40 @@
 <?php
 
-if(isset($_POST['password'], $_POST['username'], $_POST['newEmail'])) {
+session_start();
+
+if(isset($_SESSION['password'], $_SESSION['username'])) {
     include __DIR__ . "/../../incl/lib/connection.php";
     include __DIR__ . "/../../incl/lib/mainLib.php";
     include __DIR__ . "/../../incl/lib/exploitPatch.php";
 
+    if(isset($_POST['newEmail'])) {
+
     $ml = new MainLib();
 
-    $username = exploitPatch::clean($_POST['username']);
-    $password = exploitPatch::clean($_POST['password']);
     $newEmail = exploitPatch::clean($_POST['newEmail']);
 
-    $authState = $ml->checkAuthentication($username, $password);
+    $authState = $ml->checkAuthentication($_SESSION['username'], $_SESSION['password']);
 
     if($authState == 1) {
-        $ml->changeEmail($username, $password, $newEmail);
-        $ml->logAction(13, $username, $newEmail);
-        displayForm();
-        echo "<h1>Email Changed!<h1>";
+        $result = $ml->changeEmail($_SESSION['username'], $_SESSION['password'], $newEmail);
+        $ml->logAction(13, $_SESSION['username'], $newEmail);
+        if($result != 1) {
+            echo("<h1>Error!<h1>");
+        } else {
+            echo "<h1>Email Changed!<h1>";
+        }
     } else {
-        displayForm();
-        die("<h1>Invalid Login Details<h1>");
+        die("<h1>Access Denied!<h1>");
     }
 } else {
-displayForm();
+    displayForm();
+}
+} else {
+die("<h1>Access denied!</h1>");
 }
 
 function displayForm() {
     echo("<form action='changeEmail.php' method='POST'>
-    <label for='username'>Username:</label>
-    <input type='text' name='username' id='username' required>
-    <br>
-    <label for='password'>Password:</label>
-    <input type='password' name='password' id='password' required>
-    <br>
     <label for='newEmail'>New Email:</label>
     <input type='email' name='newEmail' id='newEmail' min=3 max=20 required>
     <br>

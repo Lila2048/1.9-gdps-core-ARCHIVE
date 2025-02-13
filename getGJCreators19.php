@@ -1,6 +1,11 @@
 <?php
 
 include __DIR__ . "/incl/lib/connection.php";
+include __DIR__ . "/incl/lib/mainLib.php";
+
+$ml = new MainLib();
+
+$bansCsv = $ml->getCommaSeparatedBans(4);
 
 # getting data
 
@@ -19,9 +24,15 @@ if($secret != "Wmfd2893gb7") {
 
 if($type == "top") {
 
+    $queryString = "SELECT * FROM users WHERE creatorPoints > 0 AND userID";
+
+    if($bansCsv != "") {
+        $queryString .= " NOT IN ($bansCsv)";
+    }
+
     # top 100
 
-    $sql = $conn->prepare("SELECT * FROM users WHERE creatorPoints > 0 ORDER BY creatorPoints DESC LIMIT 100");
+    $sql = $conn->prepare($queryString . " ORDER BY stars DESC LIMIT 100");
     $sql->execute();
 
     $result = $sql->fetchAll(PDO::FETCH_ASSOC);

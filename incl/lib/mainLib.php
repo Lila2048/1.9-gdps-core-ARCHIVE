@@ -390,13 +390,13 @@
             return $result;
         }
 
-        public function getAccountID($username, $password) {
+        public function getAccountID($username, $password = 0) {
             require __DIR__ . "/connection.php";
             include_once __DIR__ . "/gjp.php";
             $gjpTools = new gjpTools();
             $password = $gjpTools->MakeGJP($password);
-            $sql = $conn->prepare("SELECT id FROM accounts WHERE username = :username AND password = :password");
-            $sql->execute([':username' => $username, ':password' => $password]);
+            $sql = $conn->prepare("SELECT id FROM accounts WHERE username = :username");
+            $sql->execute([':username' => $username]);
 
             $result = $sql->fetchColumn();
 
@@ -469,6 +469,27 @@
             $result = $sql->fetchColumn();
             return $result;
         }
-    }
 
+        public function getCommaSeparatedBans($type) {
+            require __DIR__ . "/connection.php";
+            $bans = "";
+            $sql = $conn->prepare("SELECT user FROM bans WHERE banType = :banType");
+            $sql->execute([':banType' => $type]);
+            $result = $sql->fetchAll(PDO::FETCH_COLUMN, 0);
+        
+            if (!empty($result)) {
+                $bans = implode(",", $result);
+            }
+        
+            return $bans;
+        }
+
+        public function getBansCount($type) {
+            require __DIR__ . "/connection.php";
+            $sql = $conn->prepare("SELECT COUNT(*) FROM bans WHERE banType = :banType");
+            $sql->execute([':banType' => $type]);
+            $result = $sql->fetchColumn();
+            return $result;
+        }
+    }
 ?>

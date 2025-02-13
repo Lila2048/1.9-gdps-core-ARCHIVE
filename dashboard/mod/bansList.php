@@ -1,23 +1,23 @@
 <?php
 
-if(isset($_POST['username'], $_POST['password'])) {
     # check auth
     include __DIR__ . "/../../incl/lib/connection.php";
     include __DIR__ . "/../../incl/lib/mainLib.php";
-    
+
+    session_start();
+
+    if(!isset($_SESSION['username'], $_SESSION['password'])) {
+        die("<h1>Access denied!</h1>");
+    }
 
     $ml = new MainLib();
 
-    $userName = $_POST['username'];
-    $password = $_POST['password'];
-
-    $accountID = $ml->getAccountID($userName, $password);
+    $accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
     $udid = $ml->getUDIDFromAccountID($accountID);
     $permState = $ml->checkPerms(2, $udid);
 
     if($permState != 1) {
-        displayForm();
-        die("<h1>Missing perms or invalid login!</h1>");
+        die("<h1>Access denied!</h1>");
     } else {
         # fetch banned users
         $sql = $conn->prepare("SELECT user, banType, expires, reason, timestamp FROM bans");
@@ -73,21 +73,5 @@ if(isset($_POST['username'], $_POST['password'])) {
         </html>
         <?php
     }
-} else {
-    # display auth form
-    displayForm();
-}
-
-function displayForm() {
-    echo "<form action='bansList.php' method='POST'>
-            <label for='username'>Username:</label>
-            <input type='text' name='username' id='username' required>
-            <br>
-            <label for='password'>Password:</label>
-            <input type='password' name='password' id='password' required>
-            <br>
-            <input type='submit'>
-            </form>";
-}
 
 ?>
