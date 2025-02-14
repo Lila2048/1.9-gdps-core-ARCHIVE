@@ -67,7 +67,7 @@
 
         $stars = $sql->fetchColumn();
 
-        $sql = $conn->prepare("(SELECT * FROM users WHERE stars <= $stars ORDER BY stars DESC LIMIT 25) UNION (SELECT * FROM users WHERE stars > $stars ORDER BY stars ASC LIMIT 25)");
+        $sql = $conn->prepare("(SELECT * FROM users WHERE stars <= $stars ORDER BY stars DESC LIMIT 50) UNION (SELECT * FROM users WHERE stars >= $stars ORDER BY stars ASC LIMIT 50)");
 
         $sql->execute();
 
