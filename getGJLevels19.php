@@ -25,8 +25,7 @@ $secret = $_POST['secret'];
 $completedLevels = "";
 $noStar = "";
 $star = "";
-$song = "";
-$isNGSong = false;
+$song = -1;
 
 # optional params
 
@@ -44,9 +43,10 @@ if(isset($_POST['star'])) {
 
 if(isset($_POST['song'])) {
     $song = $_POST['song'];
-    if(isset($_POST['customSong'])) {
-        $isNGSong = true;
-    }
+}
+
+if(isset($_POST['customSong'])) {
+    $isCustomSong = $_POST['customSong'];
 }
 
 $trendingTime = time() - 604800;
@@ -179,11 +179,13 @@ if($noStar == 1) {
     $queryString .= "AND stars = 0 ";
 }
 
-if($song == 1) {
-    if($isNGSong == false) {
-    $queryString .= "AND audioTrack = $song ";
-    } else {
+if($song !=  -1) {
+    if(isset($isCustomSong)) {
         $queryString .= "AND songID = $song ";
+    } else {
+        # apparently rob made songs start from 0 in the db but stereo madness is id 1 according to this endpoint
+        $song = $song - 1;
+        $queryString .= "AND audioTrack = $song AND songID = 0 ";
     }
 }
 
