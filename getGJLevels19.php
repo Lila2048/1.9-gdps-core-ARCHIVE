@@ -156,7 +156,7 @@ if($original == 1) {
 }
 
 if($uncompleted == "") {
-    $queryString .= "AND levelID NOT IN $completedLevels ";
+    $queryString .= "AND levelID NOT IN ($completedLevels) ";
 }
 
 if($featured == 1) {
@@ -165,10 +165,6 @@ if($featured == 1) {
 
 if($twoPlayer == 1) {
     $queryString .= "AND twoPlayer = 1 ";
-}
-
-if($noStar == 1) {
-    $queryString .= "AND stars = 0 ";
 }
 
 if($star == 1) {

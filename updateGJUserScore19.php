@@ -43,7 +43,7 @@ if($result == 0) {
 
 } else {
 
-    $sql = $conn->prepare("UPDATE users SET accountID = :accountID, userName = :userName, stars = :stars, demons = :demons, color1 = :color1, color2 = :color2, iconType = :iconType, coins = :coins, special = :special, gameVersion = :gameVersion, time = :time, icon = :icon WHERE udid = :udid");
+    $sql = $conn->prepare("UPDATE users SET accountID = :accountID, userName = :userName, stars = :stars, demons = :demons, color1 = :color1, color2 = :color2, iconType = :iconType, coins = :coins, special = :special, gameVersion = :gameVersion, time = :time, icon = :icon WHERE udid = :udid LIMIT 1");
 
 }
 
@@ -63,7 +63,10 @@ $sql->bindParam(":icon", $icon);
 
 $sql->execute();
 
-$sql = $conn->prepare("SELECT userID FROM users WHERE udid = :udid");
+$sql = $conn->prepare("DELETE FROM users WHERE udid = :udid AND time != :time");
+$sql->execute([':udid' => $udid, ':time' => $time]);
+
+$sql = $conn->prepare("SELECT userID FROM users WHERE udid = :udid ORDER BY time DESC LIMIT 1");
 $sql->bindParam(":udid", $udid);
 $sql->execute();
 

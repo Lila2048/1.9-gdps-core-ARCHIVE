@@ -335,20 +335,32 @@
             
             # Set request info
             curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, 'secret=Wmfd2893gb7&songID=' . $songID);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, 'secret=Wmfd2893gb7&songID=' . $songID . "&gameVersion=22&binaryVersion=45");
             
             $content = trim(curl_exec($ch));
             curl_close($ch);
 
-            echo($content);
-
             $songInfo = explode("|",$content);
             $songInfo = str_replace("~", "", $songInfo);
 
-            $sql = $conn->prepare("INSERT INTO songs (id, name, authorID, authorName, size, download) VALUES (:id, :name, :authorID, :authorName, :size, :download)");
-            $sql->execute([':id' => $songInfo[1], ':name' => $songInfo[3], ':authorID' => $songInfo[6], ':authorName' => $songInfo[7], ':size' => $songInfo[9], ':download'=> $songInfo[13]]);
+            $platform = -1;
 
-            } else {
+            if($songInfo[1] >= 10000000) {
+                $platform = 0;
+            }
+
+            switch($songInfo[17]) {
+                case 0:
+                    break;
+                case 1:
+                    $platform = 1;
+            }
+
+            $download = 0;
+
+            $sql = $conn->prepare("INSERT INTO songs (id, name, authorID, authorName, size, download, platform) VALUES (:id, :name, :authorID, :authorName, :size, :download, :platform)");
+            $sql->execute([':id' => $songInfo[1], ':name' => $songInfo[3], ':authorID' => $songInfo[6], ':authorName' => $songInfo[7], ':size' => $songInfo[9], ':download'=> $songInfo[13], ':platform' => $platform]);
+            }
                 $sql = $conn->prepare("SELECT * FROM songs WHERE id = :songID");
                 $sql->execute([':songID' => $songID]);
 
@@ -359,8 +371,24 @@
                     die();
                 }
 
-                return("1~|~". $result['id'] . "~|~2~|~" . $result['name'] . "~|~3~|~" . $result['authorID'] . "~|~4~|~" . $result['authorName'] . "~|~5~|~" . $result['size'] . "~|~10~|~" . $result['download']);
-            }
+                switch($result['platform']) {
+                    case -1:
+                        break;
+                    case 0:
+                        $result['name'] = "(lib) " . $result['name'];
+                        break;
+                    case 1:
+                        $result['name'] = "(NCS) " . $result['name'];
+                        break;
+                }
+
+                if($result['download'] == "CUSTOMURL") {
+                    $download = "https://geometrydashfiles.b-cdn.net/music/" . $result['id'] . ".ogg";
+                } else {
+                    $download = $result['download'];
+                }
+
+                return("1~|~". $result['id'] . "~|~2~|~" . $result['name'] . "~|~3~|~" . $result['authorID'] . "~|~4~|~" . $result['authorName'] . "~|~5~|~" . $result['size'] . "~|~10~|~" . $download);
         }
 
         public function checkAuthentication($username, $password) {
@@ -490,6 +518,56 @@
             $sql->execute([':banType' => $type]);
             $result = $sql->fetchColumn();
             return $result;
+        }
+        public static function base64url_encode($data) {
+
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+
+        }
+
+
+
+        public static function base64url_decode($data) {
+
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+
+        }
+
+        # unfinished, extremely taxing function that downloads the entire music lib. don't use
+        public function updateMusicLib() {
+            $index = 0;
+            include __DIR__ . "/connection.php";
+            $currentVer = file_get_contents("https://geometrydashfiles.b-cdn.net/music/musiclibrary_version_02.txt");
+            $savedVer = file_get_contents(__DIR__ . "/../../data/songs/libVersion.txt");
+            if($currentVer != $savedVer) {
+            file_put_contents(__DIR__ . "/../../data/songs/libVersion.txt", $currentVer);
+            $lib = zlib_decode(self::base64url_decode(file_get_contents("https://geometrydashfiles.b-cdn.net/music/musiclibrary_02.dat")));
+            $lib = explode("|", $lib);
+            $artists = explode(";", $lib[1]);
+            $songs = explode(";", $lib[2]);
+            foreach($songs as $song) {
+                $song = explode(",", $song);
+                $download = "https://geometrydashfiles.b-cdn.net/music/" . $song[0] . ".mp3";
+                $sql = $conn->prepare("INSERT INTO songs (id, name, authorID, authorName, size, download, platform) VALUES (:id, :name, :authorID, 'Library', :size, :download, :plat)");
+                $sql->execute([':id' => $song[0], ':name' => $song[1], ':authorID' => $song[2], ':size' => $song[3], ':plat' => $song[6], ':download' => $download]);
+                $index++;
+            }
+            }
+        }
+
+        public function unbanUser($banID) {
+            include __DIR__ . "/connection.php";
+            # check if ban exists
+            $sql = $conn->prepare("SELECT COUNT(*) FROM bans WHERE id = :banID");
+            $sql->execute([':banID' => $banID]);
+            $count = $sql->fetchColumn();
+            if($count != 1) {
+                return 2;
+            } else {
+            $sql = $conn->prepare("DELETE FROM bans WHERE id = :banID");
+            $sql->execute([':banID' => $banID]);
+            return 1;
+            }
         }
     }
 ?>

@@ -1,21 +1,29 @@
 <?php
 
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/exploitPatch.php";
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
+
 session_start();
 
-if(isset($_SESSION['username'], $_SESSION['username'])) {
-    # check auth
-    include __DIR__ . "/../../incl/lib/connection.php";
-    include __DIR__ . "/../../incl/lib/mainLib.php";
-    include __DIR__ . "/../../incl/lib/exploitPatch.php";
+$ml = new MainLib();
+$dl = new DashboardLib();
 
-    $ml = new MainLib();
+$dl->printStyle();
+$dl->printHeader();
+
+if(!isset($_SESSION['username'], $_SESSION['username'])) {
+    die($dl->printMessageBox3("Access denied!", "Please log in to use this page!"));
+}
+    # check auth
 
     $accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
     $udid = $ml->getUDIDFromAccountID($accountID);
     $permState = $ml->checkPerms(1, $udid);
 
     if($permState != 1) {
-        die("<h1>Access denied!</h1>");
+        die($dl->printMessageBox3("Access denied!", "You do not have the correct permissions to use this page!"));
     }
 
     if(isset($_POST['stars'], $_POST['levelID'], $_POST['feature'])) {
@@ -24,31 +32,21 @@ if(isset($_SESSION['username'], $_SESSION['username'])) {
         $levelID = exploitPatch::clean($_POST['levelID']);
         $feature = exploitPatch::clean($_POST['feature']);
 
+        if($stars > 10 || $stars < 1 || $feature > 1 || $feature < 0) {
+            die($dl->printMessageBox("Error!", "The data you entered is invalid!"));
+        }
+
+        $levelInfo = $ml->getLevelInfo($levelID);
+
+        if($levelInfo == false) {
+            die($dl->printMessageBox("Error!", "This level doesn't seem to exist..."));
+        }
+
         $ml->sendLevel($levelID, $stars, $feature, $udid);
-        displayForm();
-        echo("<h1>Level Sent!<h1>");
+        die($dl->printMessageBox5("Level sent!", "You successfully sent <strong>" . $levelInfo['levelName'] . "</strong> For $stars stars"));
 
     } else {
-        displayForm();
+        $dl->printSendForm();
     }
-
-} else {
-    die("<h1>Access denied!</h1>");
-}
-
-function displayForm() {
-    echo "<form action='sendLevel.php' method='POST'>
-    <label for='levelID'>levelID:</label>
-    <input type='number' name='levelID' id='levelID' min=0 required>
-    <br>
-    <label for='stars'>Stars:</label>
-    <input type='number' name='stars' id='stars' min=0 max=10 required>
-    <br>
-    <label for='feature'>Featured (1 for feature 0 for rate)</label>
-    <input type='number' name='feature' id='feature' min=0 max=1 required>
-    <br>
-    <input type='submit'>
-    </form>";
-}
 
 ?>

@@ -109,16 +109,6 @@ if($result == 0) {
     
     $sql->execute();
 
-    # link levels to new uid
-
-    $sql = $conn->prepare("UPDATE levels SET udid = :udid, userName = :userName, accountID = :accountID WHERE userID = :userID");
-    $sql->execute([':userID' => $userID, ':udid' => $udid, ':userName' => $userName, ':accountID' => $accID]);
-
-    # update comments
-
-    $sql = $conn->prepare("UPDATE comments SET udid = :udid, userName = :userName, accountID = :accountID WHERE userID = :userID");
-    $sql->execute([':userID' => $userID, ':udid' => $udid, ':userName' => $userName, ':accountID' => $accID]);
-
     echo($accID . "," . $userID);
 
     $ml->logAction(5, $userName, $udid);

@@ -1,17 +1,24 @@
 <?php
 
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/exploitPatch.php";
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
+include __DIR__ . "/../../config/main.php";
+
+$ml = new mainLib();
+$dl = new DashboardLib();
+
 session_start();
 
+$dl->printStyle();
+$dl->printHeader();
+
 if(!isset($_SESSION['username'], $_SESSION['password'])) {
-    die("<h1>Access denied<h1>");
+    die($dl->printMessageBox3("Access Denied!", "You need to login to use this page!"));
 }
 
 if(isset($_POST['songName'])) {
-include __DIR__ . "/../../incl/lib/connection.php";
-include __DIR__ . "/../../config/main.php";
-include __DIR__ . "/../../incl/lib/mainLib.php";
-
-$ml = new mainLib();
 
 $songName = $_POST['songName'];
 $username = $_SESSION['username'];
@@ -31,15 +38,14 @@ $minutes = $songReupTime / 60;
 $authState = $ml->checkAuthentication($username, $password);
 
 if($authState != 1) {
-    die("<h1>Invalid details!</h1>");
+    die($dl->printMessageBox3("Access Denied!", "Invalid login details!"));
 }
 
 if($result > time() - $songReupTime) {
-    echo("<h1>Rate limited! You may only reupload a song every $minutes minutes!</h1><button onClick='window.location.reload();'>Try again!</button><button onclick='window.location.replace(location.pathname);'>Back</button>");
-    die();
+    die($dl->printMessageBox("Rate limited!", "You can only reupload a song every $minutes minutes!"));
 }
 
-$size = 0.1;
+$size = round(filesize($_FILES['songFile']['tmp_name']) / 1000000, 2);
 
 $index = 0;
 
@@ -61,13 +67,16 @@ while($result != 0) {
 
     $result = $sql->fetchColumn();
 
-    echo("searching for valid song ID. Iteration #" . $index . "<br>");
-
     if($index > 99) {
-        echo("<h1> failed to find a valid song ID after 100 tries! try again later!</h1><button onClick='window.location.reload();'>Try again!</button><button onclick='window.location.replace(location.pathname);'>Back</button>");
-        die(-1);
+        die($dl->printMessageBox("Failed to find valid ID", "Failed to find a valid song ID after 100 tries!"));
     }
 
+}
+
+# check MIME type
+
+if(mime_content_type($_FILES['songFile']['tmp_name']) != "audio/mpeg") {
+    die($dl->printMessageBox("Song failed to upload!", "Please upload an audio file"));
 }
 
 $targetDir = __DIR__ . "/../../data/songs/";
@@ -82,26 +91,15 @@ $sql = $conn->prepare("INSERT INTO songs (id, name, authorName, size, download, 
 $sql->execute([':id' => $songID, ':name' => $songName, ':authorName' => $songAuthor, ':size' => $size, ':download' => $songLink]);
 
     if (move_uploaded_file($_FILES['songFile']['tmp_name'], $targetFile)) {
-        echo "<h2>The song file " . basename($_FILES['songFile']['name']) . " has been uploaded with an ID of $songID.<br>";
-        echo "You can access the song at: <a href='$songLink'>$songLink</a></h2><button onclick='window.location.replace(location.pathname);'>Back</button>";
+        echo $dl->printMessageBox3("Song uploaded!", "Your song has been uploaded with an ID of <strong>$songID</strong>");
     } else {
-        echo "<h1>Song failed to upload!</h1><button onClick='window.location.reload();'>Try again!</button><button onclick='window.location.replace(location.pathname);'>Back</button>";
+        die($dl->printMessageBox("Song failed to upload!", "The song failed to upload. Try again later."));
     }
 
     $ml->logAction(10, $songName, $songAuthor, $size);
 
-} else echo "<h1>Upload Song</h1>
-<form action='uploadSong.php' enctype='multipart/form-data' method='POST'>
-    <label for='songFile'>Song File:</label>
-    <input type='file' name='songFile' id='songFile' accept='.mp3' required>
-    <br>
-    <label for='songName'>Song Name:</label>
-    <input type='text' name='songName' maxlength='30' id='songName' required>
-    <br>
-    <label for='songAuthor'>Song Author:</label>
-    <input type='text' name='songAuthor' maxlength='15' id='songAuthor' required>
-    <br>
-    <input type='submit'>
-</form>";
+} else {
+    $dl->printSongReupForm();
+}
 
 ?>

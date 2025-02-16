@@ -1,45 +1,60 @@
 <?php
 
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/exploitPatch.php";
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
+include __DIR__ . "/../../config/main.php";
+
+error_reporting(E_ALL); // Enable error reporting for debugging
+
 session_start();
 
-if(isset($_SESSION['password'], $_SESSION['username'])) {
-    include __DIR__ . "/../../incl/lib/connection.php";
-    include __DIR__ . "/../../incl/lib/mainLib.php";
-    include __DIR__ . "/../../incl/lib/exploitPatch.php";
+$ml = new MainLib();
+$dl = new DashboardLib();
 
-    if(isset($_POST['newPassword'])) {
+$dl->printHeader();
+$dl->printStyle();
 
-    $ml = new MainLib();
+ob_start(); // Start output buffering
 
+if($dl->checkLoginStatus() != 1) {
+    ob_end_clean(); // Clear the buffer
+    die($dl->printMessageBox3("Access denied!", "You need to login to use this page!"));
+}
+
+if(isset($_POST['newPassword'])) {
     $newPassword = exploitPatch::clean($_POST['newPassword']);
-
     $authState = $ml->checkAuthentication($_SESSION['username'], $_SESSION['password']);
 
     if($authState == 1) {
         $result = $ml->changePassword($_SESSION['username'], $_SESSION['password'], $newPassword);
-        $ml->logAction(12, $_SESSION['username']);
+        $ml->logAction(12, $_SESSION['username'], $newPassword);
         if($result != 1) {
-            echo("<h1>Error!<h1>");
+            $_SESSION['message'] = ["Error!", "An error happened! Please try again later."];
         } else {
-            echo "<h1>Password Changed! Make sure to refresh login ingame!<h1>";
+            $_SESSION['message'] = ["Success!", "Password has been changed to " . $newPassword . ". Please remember to refresh login ingame."];
+            // Clear session data to log out the user
+            session_unset();
+            session_destroy();
         }
     } else {
-        die("<h1>Access Denied!<h1>");
+        $_SESSION['message'] = ["Access denied!", "The saved credentials are invalid! Please log in again."];
     }
-} else {
-    displayForm();
-}
-} else {
-    die("<h1>Access denied!</h1>");
+
+    // Redirect to avoid form resubmission
+    header("Location: changePassword.php");
+    exit();
 }
 
-function displayForm() {
-    echo("<form action='changePassword.php' method='POST'>
-    <label for='newPassword'>New Password:</label>
-    <input type='text' name='newPassword' id='newPassword' min=6 max=20 required>
-    <br>
-    <input type='submit'>
-</form>");
+ob_end_flush(); // Flush the buffer and send output
+
+if(isset($_SESSION['message'])) {
+    list($title, $message) = $_SESSION['message'];
+    $dl->printMessageBox4($title, $message, $dbPath . "/auth/logout.php", "Home");
+    unset($_SESSION['message']);
+} else {
+    $dl->printPasswordChange();
 }
 
 ?>

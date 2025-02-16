@@ -1,0 +1,236 @@
+.header {
+    background-color: #2e2e2e;
+    padding: 20px;
+    font-size: 17px;
+    overflow: hidden;
+    position: sticky;
+    top: 0;  
+}
+.header a {
+    color: rgb(195, 195, 195);
+    text-decoration: none;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 13px;
+    padding-right: 13px;
+}
+.header a:hover {
+    color: #ffffff;
+}
+.left-menu {
+    float: left;
+}
+.right-menu {
+    float: right;
+}
+.header a i, .header button i {
+    margin-right: 8px; /* Adjusted margin so icons don't look bad*/
+}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #4a4a4a;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.center-dialog-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.center-dialog {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    background-color: #2e2e2e;
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    color: rgb(177, 177, 177);
+    font-size: 20px;
+}
+input {
+    background-color: #3e3e3e;
+    border: 1px solid #5e5e5e;
+    color: rgb(177, 177, 177);
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-size: 16px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box; /* Makes size work correctly*/
+}
+input:focus {
+    border-color: #ffffff;
+    outline: none;
+}
+input[type="submit"] {
+    background-color: #7b7b7b;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 15px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+input[type="submit"]:hover {
+    background-color: #676767;
+}
+.title {
+    font-size: 36px; 
+    padding: 20px; 
+    color: #ffffff;
+    text-align: center;
+}
+.subheading {
+    font-size: 24px;
+    color: #ffffff;
+    margin: 10px 0;
+    text-align: center;
+}
+/* Keep these styles the same as input[type="submit"] */
+button {
+    background-color: #7b7b7b;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 15px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 50%;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+button:hover {
+    background-color: #676767;
+}
+.button-link {
+    color: white;
+    text-decoration: none;
+    padding: 15px 20px;
+    background-color: #7b7b7b;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-block;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+    margin:10px;
+}
+.button-link:hover {
+    background-color: #676767;
+}
+.quick-actions a {
+    color: rgb( 177, 177, 177);
+    margin-top:10px;
+    margin-bottom: 10px;
+}
+.quick-actions a:hover {
+    color: #ffffff;
+}
+.quick-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin:25px;
+}
+.quick-actions li {
+    margin: 10px;
+    list-style: none;
+}
+.table-container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+    background-color: #2e2e2e;
+    color: rgb(177, 177, 177);
+}
+table th, table td {
+    padding: 12px;
+    border: 1px solid #5e5e5e;
+}
+table th {
+    background-color: #3e3e3e;
+    color: white;
+}
+table tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
+table tr:nth-child(odd) {
+    background-color: #2e2e2e;
+}
+input[type="file"] {
+    background-color: #3e3e3e;
+    border: 1px solid #5e5e5e;
+    color: rgb(177, 177, 177);
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+    font-size: 16px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+input[type="file"]::file-selector-button {
+    background-color: #7b7b7b;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px; /* Add margin to move the filename text away from the button */
+}
+input[type="file"]::file-selector-button:hover {
+    background-color: #676767;
+}
+select {
+    background-color: #3e3e3e;
+    border: 1px solid #5e5e5e;
+    color: rgb(177, 177, 177);
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+    font-size: 16px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #ffffff;
+    outline: none;
+}
+select option {
+    background-color: #3e3e3e;
+    color: rgb(177, 177, 177);
+    padding: 10px;
+}
+.radio-container {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+.radio-container input {
+    margin-right: 10px;
+}

@@ -1,29 +1,31 @@
 <?php
 
-    # check auth
-    include __DIR__ . "/../../incl/lib/connection.php";
-    include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
 
-    session_start();
+session_start();
 
-    if(!isset($_SESSION['username'], $_SESSION['password'])) {
-        die("<h1>Access denied!</h1>");
-    }
+$dl = new DashboardLib();
+$ml = new MainLib();
 
-    $ml = new MainLib();
+$dl->printStyle();
+$dl->printHeader();
 
-    $accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
-    $udid = $ml->getUDIDFromAccountID($accountID);
-    $permState = $ml->checkPerms(2, $udid);
+# check perms
 
-    if($permState != 1) {
-        die("<h1>Access denied!</h1>");
-    } else {
+if($dl->checkPermsLevel() < 0) {
+    die($dl->printMessageBox3("Access Denied!", "You are either not logged in or do not have the appropriate permission to access this tool."));
+}
             # fetch sent levels
             $sql = $conn->prepare("SELECT levelID, stars, feature, timestamp FROM sends ORDER BY timestamp DESC LIMIT 100");
             $sql->execute();
     
             $levels = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            if(empty($levels)) {
+                die($dl->printMessageBox("Error!", "No sent levels found!"));
+            }
         ?>
             <!DOCTYPE html>
             <html lang="en">
@@ -31,29 +33,17 @@
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Sent Levels List</title>
-                <style>
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    table, th, td {
-                        border: 1px solid black;
-                    }
-                    th, td {
-                        padding: 8px;
-                        text-align: left;
-                    }
-                </style>
             </head>
-            <body>
-                <h1>Sent Levels List</h1>
+            <div>
+                <h1 class="title">Sent Levels List</h1>
+                <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th>Level ID</th>
                             <th>Stars</th>
                             <th>Feature</th>
-                            <th>Timestamp</th>
+                            <th>Sent At</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,9 +57,6 @@
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             </body>
             </html>
-        <?php
-    }
-
-?>

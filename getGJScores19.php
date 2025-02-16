@@ -24,10 +24,10 @@
 
     if($type == "top") {
 
-        $queryString = "SELECT * FROM users WHERE stars > 0 AND userID";
+        $queryString = "SELECT * FROM users WHERE stars > 0 ";
 
         if($bansCsv != "") {
-            $queryString .= " NOT IN ($bansCsv)";
+            $queryString .= "AND userID NOT IN ($bansCsv)";
         }
 
         # top 100

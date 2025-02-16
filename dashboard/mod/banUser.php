@@ -3,13 +3,18 @@
 include __DIR__ . "/../../incl/lib/connection.php";
 include __DIR__ . "/../../incl/lib/mainLib.php";
 include __DIR__ . "/../../incl/lib/exploitPatch.php";
-
-$ml = new mainLib();
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
 
 session_start();
 
+$ml = new mainLib();
+$dl = new DashboardLib();
+
+$dl->printStyle();
+$dl->printHeader();
+
 if(!isset($_SESSION['username'], $_SESSION['password'])) {
-    die("<h1>Access denied!</h1>");
+    die($dl->printMessageBox3("Access Denied!", "You need to sign in to view this page!"));
 }
 
 $accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
@@ -17,7 +22,7 @@ $udid = $ml->getUDIDFromAccountID($accountID);
 $permState = $ml->checkPerms(1, $udid);
 
 if($permState != 1) {
-    die("<h1>Access Denied!</h1>");
+    die($dl->printMessageBox3("Access Denied!", "You do not have the appropriate permissions to use this tool!"));
 } else {
 
     if(isset($_POST['banType'], $_POST['targetID'], $_POST['expires'], $_POST['reason'])) {
@@ -26,12 +31,18 @@ if($permState != 1) {
         $targetID = exploitPatch::clean($_POST['targetID']);
         $expires = exploitPatch::clean($_POST['expires']);
         $reason = base64_encode(exploitPatch::clean($_POST['reason']));
-
+        
         if($expires == 0) {
             $expires = 2147483647;
         }
 
         $banTypeInt = 1;
+
+        $userInfo = $ml->getUserStats($targetID);
+
+        if($userInfo == false) {
+            die($dl->printMessageBox("Error!", "This user doesn't seem to exist..."));
+        }
 
         # check auth
 
@@ -54,34 +65,9 @@ if($permState != 1) {
         }
             $sql = $conn->prepare("INSERT INTO bans (banType, expires, user, reason, timestamp) VALUES (:banType, :expires, :user, :reason, UNIX_TIMESTAMP())");
             $sql->execute([':banType' => $banTypeInt, ':expires' => $expires, ':user' => $targetID, ':reason' => $reason]);
-            displayForm();
-        echo("<h1>User banned!</h1>");
+        $dl->printMessageBox3("User banned!", "You successfully banned <strong>" . $userInfo['userName'] . "</strong> until <strong>" . date('Y-m-d', $expires) . "</strong>");
     } else {
-        displayForm();
+        $dl->printBanUserForm();
     }
 }
-
-function displayForm() {
-    echo("<form action='banUser.php' method='POST'>
-            <label for='banType'>Ban Type:</label>
-            <select id='banType' name='banType' required>
-                <option value='uploading'>Uploading Levels</option>
-                <option value='commenting'>Commenting</option>
-                <option value='creatorsLB'>Top Creators</option>
-                <option value='playersLB'>Top Players</option>
-            </select>
-            <br>
-            <label for='targetID'>Target userID:</label>
-            <input type='number' name='targetID' id='targetID' required>
-            <br>
-            <label for='expires'>Expires (0 for never):</label>
-            <input type='number' name='expires' id='expires' required>
-            <br>
-            <label for='reason'>Reason:</label>
-            <input type='text' name='reason' id='reason' required>
-            <br>
-            <input type='submit' id='submit'>
-        </form>");
-}
-
 ?>

@@ -1,29 +1,32 @@
 <?php
 
-    # check auth
-    include __DIR__ . "/../../incl/lib/connection.php";
-    include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
 
-    session_start();
+session_start();
 
-    if(!isset($_SESSION['username'], $_SESSION['password'])) {
-        die("<h1>Access denied!</h1>");
-    }
+$dl = new DashboardLib();
+$ml = new MainLib();
 
-    $ml = new MainLib();
+$dl->printStyle();
+$dl->printHeader();
 
-    $accountID = $ml->getAccountID($_SESSION['username'], $_SESSION['password']);
-    $udid = $ml->getUDIDFromAccountID($accountID);
-    $permState = $ml->checkPerms(2, $udid);
+# check perms
 
-    if($permState != 1) {
-        die("<h1>Access denied!</h1>");
-    } else {
+if($dl->checkPermsLevel() < 0) {
+    die($dl->printMessageBox3("Access Denied!", "You are either not logged in or do not have the appropriate permission to access this tool."));
+}
         # fetch reported levels
         $sql = $conn->prepare("SELECT levelID, timestamp FROM reports LIMIT 100");
         $sql->execute();
 
         $reports = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        if(empty($reports)) {
+            die($dl->printMessageBox("Error!", "No reported levels found!"));
+        }
+
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -46,7 +49,8 @@
             </style>
         </head>
         <body>
-            <h1>Reported Levels List</h1>
+            <h1 class="title">Reported Levels List</h1>
+            <div class="table-container">
             <table>
                 <thead>
                     <tr>
@@ -63,9 +67,6 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
         </body>
         </html>
-        <?php
-    }
-
-?>

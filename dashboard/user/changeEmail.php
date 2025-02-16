@@ -1,45 +1,53 @@
 <?php
 
+include __DIR__ . "/../../incl/lib/connection.php";
+include __DIR__ . "/../../incl/lib/mainLib.php";
+include __DIR__ . "/../../incl/lib/exploitPatch.php";
+include __DIR__ . "/../../incl/lib/dashboardLib.php";
+
 session_start();
 
-if(isset($_SESSION['password'], $_SESSION['username'])) {
-    include __DIR__ . "/../../incl/lib/connection.php";
-    include __DIR__ . "/../../incl/lib/mainLib.php";
-    include __DIR__ . "/../../incl/lib/exploitPatch.php";
+$ml = new MainLib();
+$dl = new DashboardLib();
 
-    if(isset($_POST['newEmail'])) {
+$dl->printStyle();
+$dl->printHeader();
 
-    $ml = new MainLib();
+ob_start();
 
+if($dl->checkLoginStatus() != 1) {
+    ob_end_clean();
+    die($dl->printMessageBox3("Access denied!", "You need to login to use this page!"));
+}
+
+if(isset($_POST['newEmail'])) {
     $newEmail = exploitPatch::clean($_POST['newEmail']);
-
     $authState = $ml->checkAuthentication($_SESSION['username'], $_SESSION['password']);
 
     if($authState == 1) {
         $result = $ml->changeEmail($_SESSION['username'], $_SESSION['password'], $newEmail);
         $ml->logAction(13, $_SESSION['username'], $newEmail);
         if($result != 1) {
-            echo("<h1>Error!<h1>");
+            $_SESSION['message'] = ["Error!", "An error happened! Please try again later."];
         } else {
-            echo "<h1>Email Changed!<h1>";
+            $_SESSION['message'] = ["Success!", "Email has been changed to: " . $newEmail];
         }
     } else {
-        die("<h1>Access Denied!<h1>");
+        $_SESSION['message'] = ["Access denied!", "The saved credentials are invalid! Please log in again."];
     }
-} else {
-    displayForm();
-}
-} else {
-die("<h1>Access denied!</h1>");
+
+    header("Location: changeEmail.php");
+    exit();
 }
 
-function displayForm() {
-    echo("<form action='changeEmail.php' method='POST'>
-    <label for='newEmail'>New Email:</label>
-    <input type='email' name='newEmail' id='newEmail' min=3 max=20 required>
-    <br>
-    <input type='submit'>
-</form>");
+ob_end_flush();
+
+if(isset($_SESSION['message'])) {
+    list($title, $message) = $_SESSION['message'];
+    $dl->printMessageBox3($title, $message);
+    unset($_SESSION['message']);
+} else {
+    $dl->printEmailChange();
 }
 
 ?>
