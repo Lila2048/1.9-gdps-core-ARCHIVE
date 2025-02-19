@@ -2,9 +2,10 @@
     background-color: #2e2e2e;
     padding: 20px;
     font-size: 17px;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
     position: sticky;
     top: 0;  
+    z-index: 1000; /* Ensure the header is above other content */
 }
 .header a {
     color: rgb(195, 195, 195);
@@ -233,4 +234,35 @@ select option {
 }
 .radio-container input {
     margin-right: 10px;
+}
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #3e3e3e;
+    margin-top: 15px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1001;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+.dropdown-content a {
+    color: rgb(177, 177, 177);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.dropdown-content a:hover {
+    background-color: #575757;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .dropbtn {
+    color: #ffffff;
 }

@@ -6,10 +6,9 @@ This is essentially an emulator for Geometry Dash 1.9 server. I know people have
 
 ## Future Plans
 
-The server software right now is in early beta. I still have many more plans for it later on!! Some of those plans are:
+The server software right now is in beta. I still have many more plans for it later on!! Some of those plans are:
 
 * More customization options
-* Better looking dashboard
 * Proper roles system
 * Automod
 * New webhooks

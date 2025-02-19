@@ -1,4 +1,6 @@
 <?php
+
+    /*1.9 GDPS Core: this server was written by Lila2048. Original source: https://github.com/Lila2048/1.9-gdps-core .Please do not remove this watermark. If you wish to use this software, please credit Lila2048 for the original server.*/
     class MainLib {
         public function logAction($type, $value1 = 0, $value2 = 0, $value3 = 0, $value4 = 0) {
             $ip = $_SERVER['REMOTE_ADDR'];

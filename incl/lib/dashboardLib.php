@@ -38,38 +38,101 @@ class DashboardLib {
             $userInfo = $ml->getUserStats($userID);
             if($userInfo['permLevel'] > 0) {
                 echo('<div class="header">
-                <div class="left-menu">
-                    <a href="'. $dbPath . '"><i class="fas fa-home"></i>Home</a>
-                    <a href="'. $dbPath . '/user"><i class="fas fa-user"></i>User</a>
-                    <a href="'. $dbPath . '/mod"><i class="fa-solid fa-shield-halved"></i>Moderation</a>
-                    <a href="'. $dbPath . '/stats"><i class="fas fa-chart-simple"></i>Stats</a>
+        <div class="left-menu">
+            <div class="dropdown">
+                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
+            </div>
+            <div class="dropdown">
+                <a class="dropbtn"><i class="fas fa-user"></i>User</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/user/uploadSong.php">Upload Song</a>
+                    <a href="'. $dbPath . '/user/changeUsername.php">Change Username</a>
+                    <a href="'. $dbPath . '/user/changePassword.php">Change password</a>
+                    <a href="'. $dbPath . '/user/changeEmail.php">Change Email</a>
                 </div>
-                <div class="right-menu">
-                    <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+            </div>
+            <div class="dropdown">
+                <a class="dropbtn"><i class="fa-solid fa-shield-halved"></i>Moderation</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/mod/banUser.php">Ban User</a>
+                    <a href="'. $dbPath . '/mod/bansList.php">Bans List</a>
+                    <a href="'. $dbPath . '/mod/reportsList.php">Reported Levels</a>
+                    <a href="'. $dbPath . '/mod/sendLevel.php">Send Level</a>
+                    <a href="'. $dbPath . '/mod/sentList.php">Sent List</a>
+                    <a href="'. $dbPath . '/browse/getUserID.php">Get User ID</a>
+                    <a href="'. $dbPath . '/browse/unbanUser.php">Bans List</a>
                 </div>
-            </div>');
+            </div>
+            <div class="dropdown">
+                <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
+                    <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
+                    <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
+                </div>
+            </div>
+        </div>
+        <div class="right-menu">
+            <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+        </div>
+    </div>');
             } else {
                 echo('<div class="header">
-                <div class="left-menu">
-                    <a href="'. $dbPath . '"><i class="fas fa-home"></i>Home</a>
-                    <a href="'. $dbPath . '/user"><i class="fas fa-user"></i>User</a>
-                    <a href="'. $dbPath . '/stats"><i class="fas fa-chart-simple"></i>Stats</a>
+        <div class="left-menu">
+            <div class="dropdown">
+                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
+            </div>
+            <div class="dropdown">
+                <a class="dropbtn"><i class="fas fa-user"></i>User</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/user/uploadSong.php">Upload Song</a>
+                    <a href="'. $dbPath . '/user/changeUsername.php">Change Username</a>
+                    <a href="'. $dbPath . '/user/changePassword.php">Change password</a>
+                    <a href="'. $dbPath . '/user/changeEmail.php">Change Email</a>
                 </div>
-                <div class="right-menu">
-                    <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+            </div>
+            <div class="dropdown">
+                <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
+                    <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
+                    <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
                 </div>
-            </div>');
+            </div>
+        </div>
+        <div class="right-menu">
+            <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+        </div>
+    </div>');
             }
         } else {
-            echo('<div class="header">
-            <div class="left-menu">
-            <a href="'. $dbPath .'"><i class="fas fa-home"></i>Home</a>
-            <a href="'. $dbPath . '/stats"><i class="fas fa-chart-simple"></i>Stats</a>
+            echo('    <div class="header">
+        <div class="left-menu">
+            <div class="dropdown">
+                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
             </div>
-            <div class="right-menu">
-                <a href="'. $dbPath . '/auth/login.php"><i class="fa-solid fa-right-to-bracket"></i>Login</a>
+            <div class="dropdown">
+                <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
+                    <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
+                    <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
+                    <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
+                </div>
             </div>
-        </div>');
+        </div>
+        <div class="right-menu">
+            <a href="'. $dbPath . '/auth/login.php"><i class="fa-solid fa-right-to-bracket"></i>Login</a>
+        </div>
+    </div>');
         }
     }
 
