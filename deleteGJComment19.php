@@ -1,11 +1,16 @@
 <?php
 
 include __DIR__ . "/incl/lib/connection.php";
+include __DIR__ . "/config/main.php";
 
 $udid = $_POST['udid'];
 $accountID = $_POST['accountID'];
 $commentID = $_POST['commentID'];
 $secret = $_POST['secret'];
+
+if($accountID == 0 && $requireAuthentication == true) {
+    die("-1");
+}
 
 # secret check
 

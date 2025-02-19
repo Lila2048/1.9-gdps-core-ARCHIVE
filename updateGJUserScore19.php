@@ -3,6 +3,7 @@
 include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/mainLib.php";
 include __DIR__ . "/incl/lib/exploitPatch.php";
+include __DIR__ . "/config/main.php";
 
 # Getting all the data
 
@@ -22,6 +23,10 @@ $secret = exploitPatch::clean($_POST['secret']);
 $time = time();
 
 $ml = new mainLib();
+
+if($accountID == 0 && $requireAuthentication == true) {
+    die("-1");
+}
 
 if($secret != "Wmfd2893gb7") {
     die("-1");

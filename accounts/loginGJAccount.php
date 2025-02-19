@@ -103,12 +103,6 @@ if($result == 0) {
     
     $sql->execute();
 
-    $sql = $conn->prepare("UPDATE users SET udid = :udid WHERE accountID = :accountID");
-    $sql->bindParam(":udid", $udid);
-    $sql->bindParam(":accountID", $accID);
-    
-    $sql->execute();
-
     echo($accID . "," . $userID);
 
     $ml->logAction(5, $userName, $udid);

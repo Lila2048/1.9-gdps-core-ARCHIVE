@@ -4,6 +4,7 @@ include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/mainLib.php";
 include __DIR__ . "/incl/lib/commands.php";
 include __DIR__ . "/incl/lib/exploitPatch.php";
+include __DIR__ . "/config/main.php";
 
 # getting data
 
@@ -16,6 +17,10 @@ $commentRaw = exploitPatch::clean($_POST['comment']);
 $secret = exploitPatch::clean($_POST['secret']);
 $ip = $ip = $_SERVER['REMOTE_ADDR'];
 $timestamp = time();
+
+if($accountID == 0 && $requireAuthentication == true) {
+    die("-1");
+}
 
 $ml = new mainLib();
 $cmds = new commands();

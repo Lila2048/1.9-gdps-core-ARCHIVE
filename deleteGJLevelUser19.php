@@ -3,6 +3,7 @@
 include __DIR__ . "/incl/lib/mainLib.php";
 include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/config/main.php";
+include __DIR__ . "/config/main.php";
 
 # gathering data
 
@@ -11,13 +12,21 @@ $udid = $_POST['udid'];
 $levelID = $_POST['levelID'];
 $accountID =  $_POST['accountID'];
 
+if($accountID == 0 && $requireAuthentication == true) {
+    die("-1");
+}
+
 $ml = new MainLib();
 
 if($ratedLevelDeletes == false) {
     $levelInfo = $ml->getLevelInfo($levelID);
     if($levelInfo['stars'] != 0) {
-        echo(-1);
-        die();
+        die("-1");
+    }
+} else {
+    $levelInfo = $ml->getLevelInfo($levelID);
+    if($levelInfo['stars'] != 0) {
+    $ml->unrateLevel($levelID);
     }
 }
 

@@ -4,6 +4,7 @@ include __DIR__ . "/incl/lib/connection.php";
 include __DIR__ . "/incl/lib/mainLib.php";
 include __DIR__ . "/config/main.php";
 include __DIR__ . "/incl/lib/exploitPatch.php";
+include __DIR__ . "/config/main.php";
 
 $ml = new MainLib();
 
@@ -36,6 +37,10 @@ $ip = $_SERVER['REMOTE_ADDR'];
 $uploadDate = time();
 
 # wow thats a lot
+
+if($accountID == 0 && $requireAuthentication == true) {
+    die("-1");
+}
 
 $placedID = "";
 
@@ -109,7 +114,7 @@ echo($placedID);
         die("-1");
     } else {
 
-    $sql = $conn->prepare("UPDATE levels SET gameVersion = :gameVersion, levelDesc = :levelDesc, levelVersion = :levelVersion, levelLength = :levelLength, audioTrack = :audioTrack, password = :password, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, extraString = :extraString, levelReplay = :levelReplay, updateDate = UNIX_TIMESTAMP(), ip = :ip, userName = :userName WHERE levelID = :levelID");
+    $sql = $conn->prepare("UPDATE levels SET levelName = :levelName, gameVersion = :gameVersion, levelDesc = :levelDesc, levelVersion = :levelVersion, levelLength = :levelLength, audioTrack = :audioTrack, password = :password, original = :original, twoPlayer = :twoPlayer, songID = :songID, objects = :objects, extraString = :extraString, levelReplay = :levelReplay, updateDate = UNIX_TIMESTAMP(), ip = :ip, userName = :userName WHERE levelID = :levelID");
 
     $sql->bindParam(":gameVersion", $gameVersion);
     $sql->bindParam(":levelDesc", $levelDesc);
@@ -126,6 +131,7 @@ echo($placedID);
     $sql->bindParam(":ip", $ip);
     $sql->bindParam(":userName", $userName);
     $sql->bindParam(":levelID", $levelID);
+    $sql->bindParam(":levelName", $levelName);
 
     $sql->execute();
 

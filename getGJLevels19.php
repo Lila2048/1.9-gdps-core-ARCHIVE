@@ -114,12 +114,12 @@ switch($type) {
     case 7: # magic tab
         $extra = 7;
         $queryString .= "WHERE objects > 9999 AND stars = 0 ";
-        $orderString .= "ORDER BY uploadDate ";
+        $orderString .= "ORDER BY uploadDate DESC ";
         break;
     case 10: # map packs
         $extra = 10;
         $queryString .= "WHERE levelID IN ($str) ";
-        $orderString .= "ORDER BY stars DESC";
+        $orderString .= "ORDER BY stars DESC ";
         break;
 }
 

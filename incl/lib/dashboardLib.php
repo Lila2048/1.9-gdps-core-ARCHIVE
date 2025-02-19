@@ -167,7 +167,7 @@ class DashboardLib {
         echo "<div class='center-dialog-container'>
         <div class='center-dialog'>
             <div class='title'>Welcome to $serverName</div>
-            <div class='text'>Welcome to $serverName! Here you can browse through levels, manage your account, and more! Below are some shortcuts for common things to do here.</div>
+            <div class='text'>Welcome to $serverName! Here you can browse through the server, manage your account, and more! Below are some shortcuts for common things to do here.</div>
             <div class='quick-actions'>
                 <li><a href='" .$dbPath . "/user/uploadSong.php'.''>Upload Song</a></li>
                 <li><a href='". $dbPath . "/stats/reuploadsTable.php'.''>Reuploaded Songs List</a></li>
