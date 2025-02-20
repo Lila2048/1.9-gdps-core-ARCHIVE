@@ -59,8 +59,8 @@ class DashboardLib {
                     <a href="'. $dbPath . '/mod/reportsList.php">Reported Levels</a>
                     <a href="'. $dbPath . '/mod/sendLevel.php">Send Level</a>
                     <a href="'. $dbPath . '/mod/sentList.php">Sent List</a>
-                    <a href="'. $dbPath . '/browse/getUserID.php">Get User ID</a>
-                    <a href="'. $dbPath . '/browse/unbanUser.php">Bans List</a>
+                    <a href="'. $dbPath . '/mod/getUserID.php">Get User ID</a>
+                    <a href="'. $dbPath . '/mod/unbanUser.php">Bans List</a>
                 </div>
             </div>
             <div class="dropdown">
