@@ -32,6 +32,12 @@ if($secret != "Wmfd2893gb7") {
     die("-1");
 }
 
+$sql = $conn->prepare("SELECT userID FROM users WHERE udid = :udid ORDER BY time DESC LIMIT 1");
+$sql->bindParam(":udid", $udid);
+$sql->execute();
+
+$userID = $sql->fetchColumn();
+
 # checking if player data is in the db already
 
 $sql = $conn->prepare("SELECT COUNT(*) FROM users WHERE udid = :udid");
@@ -44,15 +50,27 @@ if($result == 0) {
 
     # user has never submitted information before
 
+    $starsDiff = $stars;
+    $demonsDiff = $demons;
+    $coinsDiff = $coins;
+
     $sql = $conn->prepare("INSERT INTO users (udid, accountID, userName, stars, demons, color1, color2, iconType, coins, special, gameVersion, time, icon) VALUES (:udid, :accountID, :userName, :stars, :demons, :color1, :color2, :iconType, :coins, :special, :gameVersion, :time, :icon)");
+    $sql->bindParam(":udid", $udid);
 
 } else {
 
-    $sql = $conn->prepare("UPDATE users SET accountID = :accountID, userName = :userName, stars = :stars, demons = :demons, color1 = :color1, color2 = :color2, iconType = :iconType, coins = :coins, special = :special, gameVersion = :gameVersion, time = :time, icon = :icon WHERE udid = :udid LIMIT 1");
+    $userID = $ml->getUserID($udid);
+    $oldData = $ml->getUserStats($userID);
+
+    $starsDiff = $stars - $oldData['stars'];
+    $coinsDiff = $coins - $oldData['coins'];
+    $demonsDiff = $demons - $oldData['demons'];
+
+    $sql = $conn->prepare("UPDATE users SET accountID = :accountID, userName = :userName, stars = :stars, demons = :demons, color1 = :color1, color2 = :color2, iconType = :iconType, coins = :coins, special = :special, gameVersion = :gameVersion, time = :time, icon = :icon WHERE userID = :userID LIMIT 1");
+    $sql->bindParam(":userID", $userID);
 
 }
 
-$sql->bindParam(":udid", $udid);
 $sql->bindParam(":accountID", $accountID);
 $sql->bindParam(":userName", $userName);
 $sql->bindParam(":stars", $stars);
@@ -68,9 +86,6 @@ $sql->bindParam(":icon", $icon);
 
 $sql->execute();
 
-$sql = $conn->prepare("DELETE FROM users WHERE udid = :udid AND time != :time");
-$sql->execute([':udid' => $udid, ':time' => $time]);
-
 $sql = $conn->prepare("SELECT userID FROM users WHERE udid = :udid ORDER BY time DESC LIMIT 1");
 $sql->bindParam(":udid", $udid);
 $sql->execute();
@@ -79,6 +94,6 @@ $userID = $sql->fetchColumn();
 
 echo($userID);
 
-$ml->logAction(7, $userID, $stars, $demons, $coins);
+$ml->logAction(7, $userID, $starsDiff, $demonsDiff, $coinsDiff);
 
 ?>

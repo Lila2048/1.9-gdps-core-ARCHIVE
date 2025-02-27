@@ -24,116 +24,108 @@ class DashboardLib {
     }
 
     public function printHeader() {
-
         include_once __DIR__ . "/mainLib.php";
-
+    
         $ml = new mainLib();
-
+    
+        $isLogin = false;
+    
         global $dbPath;
-
+    
+        $headerString = '<div class="header">
+        <div class="left-menu">
+            <div class="dropdown">
+                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
+            </div>';
+    
         if(isset($_SESSION['username'], $_SESSION['password'])) {
+            $isLogin = true;
             $accID = $ml->getAccountID($_SESSION['username']);
             $udid = $ml->getUDIDFromAccountID($accID);
             $userID = $ml->getUserID($udid);
             $userInfo = $ml->getUserStats($userID);
+            $headerString .= '<div class="dropdown">
+                <a class="dropbtn"><i class="fas fa-user"></i>User</a>
+                <div class="dropdown-content">
+                    <a href="'. $dbPath . '/user/changeUsername.php">Change Username</a>
+                    <a href="'. $dbPath . '/user/changePassword.php">Change password</a>
+                    <a href="'. $dbPath . '/user/changeEmail.php">Change Email</a>
+                </div>
+            </div>';
+    
+            $headerString .= '<div class="dropdown">
+            <a class="dropbtn"><i class="fa-solid fa-upload"></i>Reupload</a>
+            <div class="dropdown-content">
+                <a href="'. $dbPath . '/reupload/uploadSong.php">Upload Song</a>
+                <a href="'. $dbPath . '/reupload/levelToGMD.php">Level To GMD</a>
+                <!--<a href="'. $dbPath . '/reupload/levelReupload.php">Level Reupload</a>-->
+            </div>
+        </div>';
+    
             if($userInfo['permLevel'] > 0) {
-                echo('<div class="header">
-        <div class="left-menu">
-            <div class="dropdown">
-                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
-            </div>
-            <div class="dropdown">
-                <a class="dropbtn"><i class="fas fa-user"></i>User</a>
-                <div class="dropdown-content">
-                    <a href="'. $dbPath . '/user/uploadSong.php">Upload Song</a>
-                    <a href="'. $dbPath . '/user/changeUsername.php">Change Username</a>
-                    <a href="'. $dbPath . '/user/changePassword.php">Change password</a>
-                    <a href="'. $dbPath . '/user/changeEmail.php">Change Email</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a class="dropbtn"><i class="fa-solid fa-shield-halved"></i>Moderation</a>
-                <div class="dropdown-content">
-                    <a href="'. $dbPath . '/mod/banUser.php">Ban User</a>
-                    <a href="'. $dbPath . '/mod/bansList.php">Bans List</a>
-                    <a href="'. $dbPath . '/mod/reportsList.php">Reported Levels</a>
-                    <a href="'. $dbPath . '/mod/sendLevel.php">Send Level</a>
-                    <a href="'. $dbPath . '/mod/sentList.php">Sent List</a>
-                    <a href="'. $dbPath . '/mod/getUserID.php">Get User ID</a>
-                    <a href="'. $dbPath . '/mod/unbanUser.php">Bans List</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
-                <div class="dropdown-content">
-                    <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
-                    <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
-                    <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
-                </div>
-            </div>
-        </div>
-        <div class="right-menu">
-            <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
-        </div>
-    </div>');
-            } else {
-                echo('<div class="header">
-        <div class="left-menu">
-            <div class="dropdown">
-                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
-            </div>
-            <div class="dropdown">
-                <a class="dropbtn"><i class="fas fa-user"></i>User</a>
-                <div class="dropdown-content">
-                    <a href="'. $dbPath . '/user/uploadSong.php">Upload Song</a>
-                    <a href="'. $dbPath . '/user/changeUsername.php">Change Username</a>
-                    <a href="'. $dbPath . '/user/changePassword.php">Change password</a>
-                    <a href="'. $dbPath . '/user/changeEmail.php">Change Email</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
-                <div class="dropdown-content">
-                    <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
-                    <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
-                    <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
-                </div>
-            </div>
-        </div>
-        <div class="right-menu">
-            <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
-        </div>
-    </div>');
+                $headerString .= '<div class="dropdown">
+                    <a class="dropbtn"><i class="fa-solid fa-shield-halved"></i>Moderation</a>
+                    <div class="dropdown-content">
+                        <a href="'. $dbPath . '/mod/banUser.php">Ban User</a>
+                        <a href="'. $dbPath . '/mod/bansList.php">Bans List</a>
+                        <a href="'. $dbPath . '/mod/reportsList.php">Reported Levels</a>
+                        <a href="'. $dbPath . '/mod/sendLevel.php">Send Level</a>
+                        <a href="'. $dbPath . '/mod/sentList.php">Sent List</a>
+                        <a href="'. $dbPath . '/mod/getUserID.php">Get User ID</a>
+                        <a href="'. $dbPath . '/mod/unbanUser.php">Unban User</a>
+                    </div>
+                </div>';
             }
+
+            if($userInfo['permLevel'] > 1) {
+                $headerString .= '<div class="dropdown">
+                    <a class="dropbtn"><i class="fa-solid fa-gears"></i>Admin</a>
+                    <div class="dropdown-content">
+                        <a href="'. $dbPath . '/admin/forceChangeUsername.php">Force Change Username</a>
+                        <a href="'. $dbPath . '/admin/forceChangePassword.php">Force Change Password</a>
+                        <a href="'. $dbPath . '/admin/rateLevel.php">Rate Level</a>
+                    </div>
+                </div>';
+            }
+
+            $headerString .= '<div class="dropdown">
+            <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
+            <div class="dropdown-content">
+                <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
+                <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
+                <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
+                <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
+                <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
+                <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
+            </div>
+            </div>';
+    
+            $headerString .= '</div>
+            <div class="right-menu">
+                <a href="'. $dbPath . '/auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+            </div>
+            </div>';
         } else {
-            echo('    <div class="header">
-        <div class="left-menu">
-            <div class="dropdown">
-                <a href="'. $dbPath . '" class="dropbtn"><i class="fas fa-home"></i>Home</a>
+            $headerString .= '<div class="dropdown">
+            <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
+            <div class="dropdown-content">
+                <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
+                <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
+                <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
+                <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
+                <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
+                <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
             </div>
-            <div class="dropdown">
-                <a class="dropbtn"><i class="fas fa-chart-simple"></i>Stats</a>
-                <div class="dropdown-content">
-                    <a href="'. $dbPath . '/stats/reuploadsTable.php">Uploaded Songs</a>
-                    <a href="'. $dbPath . '/stats/leaderboard.php">Stars Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/topCreators.php">Creators Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/topDemons.php">Demons Leaderboard</a>
-                    <a href="'. $dbPath . '/stats/detailedStats.php">Detailed Stats</a>
-                    <a href="'. $dbPath . '/stats/mappacks.php">Map Packs</a>
-                </div>
+            </div>';
+
+            $headerString .= '</div>
+            <div class="right-menu">
+                <a href="'. $dbPath . '/auth/login.php"><i class="fa-solid fa-right-to-bracket"></i>Login</a>
             </div>
-        </div>
-        <div class="right-menu">
-            <a href="'. $dbPath . '/auth/login.php"><i class="fa-solid fa-right-to-bracket"></i>Login</a>
-        </div>
-    </div>');
+        </div>';
         }
+    
+        echo($headerString);
     }
 
     public function printStyle() {
@@ -474,6 +466,63 @@ class DashboardLib {
         </div>
     </div>');
     }
+
+    public function printLevelToGMD() {
+        echo('<div class="center-dialog-container">
+        <div class="center-dialog">
+            <div class="title">Level To GMD</div>
+            <div class="text">Here you can download your levels from the server as GMD files!</div><br>
+            <form action="levelToGMD.php" method="post">
+                <input type="number" name="levelID" placeholder="Level ID" min="0" required>
+                <input type="submit" value="Download level">
+            </form>
+        </div>
+    </div>');
+    }
+
+    public function printForceChangeUsername() {
+        echo '<div class="center-dialog-container">
+        <div class="center-dialog">
+            <div class="title">Force change username</div>
+            <div class="text">Here you can force change someone\'s username. They will have to refresh their login ingame after this.</div> <br>
+            <form method="POST" action="forceChangeUsername.php">
+                <input type="text" id="oldUsername" name="oldUsername" placeholder="Old Username" class="input" required>
+                <input type="text" id="newUsername" name="newUsername" placeholder="New Username" class="input" minlength=3 maxlength=20 required>
+                <input type="submit" value="Change Username" class="input">
+            </form>
+        </div>
+    </div>';
+    }
+
+    public function printForceChangePassword() {
+        echo '<div class="center-dialog-container">
+        <div class="center-dialog">
+            <div class="title">Force change password</div>
+            <div class="text">Here you can force change someone\'s password. They will have to refresh their login ingame after this.</div> <br>
+            <form method="POST" action="forceChangePassword.php">
+                <input type="text" id="username" name="username" placeholder="Username" class="input">
+                <input type="password" id="newPassword" name="newPassword" placeholder="New Password" minlength=6 maxlength=20 class="input">
+                <input type="submit" value="Change Password" class="input">
+            </form>
+        </div>
+    </div>';
+    }
+
+    public function printRateForm() {
+        echo '<div class="center-dialog-container">
+        <div class="center-dialog">
+            <div class="title">Rate Level</div>
+            <div class="text">Here you can rate a level!</div> <br>
+            <form method="POST" action="rateLevel.php">
+                <input type="number" id="levelID" name="levelID" placeholder="Level ID" min=1 class="input">
+                <input type="number" id="stars" name="stars" placeholder="Star Count" min=1 max=10 class="input">
+                <input type="number" id="featuredLevel" name="featuredLevel" placeholder="Featured" min=0 max=1 class="input">
+                <input type="submit" value="Rate Level!" class="input">
+            </form>
+        </div>
+    </div>';
+    }
+
 }
 
 ?>

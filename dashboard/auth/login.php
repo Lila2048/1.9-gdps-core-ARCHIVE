@@ -9,7 +9,7 @@ session_start();
 $dl = new DashboardLib();
 $ml = new MainLib();
 
-ob_start(); // Start output buffering
+ob_start();
 
 $dl->printStyle();
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 }
 
-ob_end_flush(); // Flush the buffer and send output
+ob_end_flush();
 
 $dl->printHeader();
 

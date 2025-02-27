@@ -5,8 +5,8 @@
         public function logAction($type, $value1 = 0, $value2 = 0, $value3 = 0, $value4 = 0) {
             $ip = $_SERVER['REMOTE_ADDR'];
             require __DIR__ . "/connection.php";
-            $sql = $conn->prepare("INSERT INTO actions (type, value1, value2, value3, ip, timestamp) VALUES (:type, :value1, :value2, :value3, :ip, UNIX_TIMESTAMP())");
-            $sql->execute([':type' => $type, ':value1' => $value1, ':value2' => $value2, ':value3' => $value3, ':ip' => $ip]);
+            $sql = $conn->prepare("INSERT INTO actions (type, value1, value2, value3, value4, ip, timestamp) VALUES (:type, :value1, :value2, :value3, :value4, :ip, UNIX_TIMESTAMP())");
+            $sql->execute([':type' => $type, ':value1' => $value1, ':value2' => $value2, ':value3' => $value3, ':value4' => $value4, ':ip' => $ip]);
             return 0;
         }
 
@@ -570,6 +570,65 @@
             $sql->execute([':banID' => $banID]);
             return 1;
             }
+        }
+
+        public function doesLevelExist($levelID) {
+            include __DIR__ . "/connection.php";
+            $sql = $conn->prepare("SELECT COUNT(*) FROM levels WHERE levelID = :levelID");
+            $sql->execute([':levelID' => $levelID]);
+            if($sql->fetchColumn() == 1) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        public function forceChangeUsername($oldUsername, $newUsername) {
+            include __DIR__ . "/connection.php";
+            $oldUsernameStats = $this->doesAccountExist($oldUsername);
+            if($oldUsernameStats != 1) {
+                return 0;
+            }
+            $newUsernameStats = $this->doesAccountExist($newUsername);
+            if($newUsernameStats == 1) {
+                return 0;
+            }
+            # accounts table
+            $sql = $conn->prepare("UPDATE accounts SET username = :newUsername WHERE username = :oldUsername");
+            $sql->execute([':newUsername' => $newUsername, ':oldUsername' => $oldUsername]);
+            # users table
+            $sql = $conn->prepare("UPDATE users SET userName = :newUsername WHERE userName = :oldUsername");
+            $sql->execute([':newUsername' => $newUsername, ':oldUsername' => $oldUsername]);
+            return 1;
+        }
+
+        public function doesAccountExist($username) {
+            include __DIR__ . "/connection.php";
+            $sql = $conn->prepare("SELECT COUNT(*) FROM accounts WHERE username = :username");
+            $sql->bindParam(":username", $username);
+            $sql->execute();
+
+            $result = $sql->fetchColumn();
+
+            if($result != 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        public function forceChangePassword($username, $newPassword) {
+            include __DIR__ . "/connection.php";
+            include_once __DIR__ . "/gjp.php";
+            $state = $this->doesAccountExist($username);
+            if($state != 1) {
+                return 0;
+            }
+            $gjpTools = new gjpTools();
+            $gjp = $gjpTools->MakeGJP($newPassword);
+            $sql = $conn->prepare("UPDATE accounts SET password = :password WHERE username = :username");
+            $sql->execute([':password' => $gjp, ':username' => $username]);
+            return 1;
         }
     }
 ?>

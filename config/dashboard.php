@@ -8,8 +8,8 @@ $serverName = "1.9 GDPS"; # GDPS server name
 
 # Download links
 
-$windowsDL = "";
-$androidDL = "";
-$iosDL = "";
+$windowsDL = "https://example.com";
+$androidDL = "https://example2.com";
+$iosDL = "https://example3.com";
 
 ?>

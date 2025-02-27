@@ -17,6 +17,6 @@ $emailChangeTime = 604800; # cooldown in seconds for email changes, default 6048
 
 $diffFacesUrl = "https://gcs.icu/WTFIcons/difficulties/";
 
-$publicSentList = false; # if the sent list on the dashboard should be public. false = mod only true = everyone (default false) (not working yet)
+$requireAuthentication = false; # require the user to be logged in to post comments, upload levels etc...
 
 ?>

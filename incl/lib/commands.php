@@ -9,8 +9,12 @@ class commands {
 
         if(substr($comment, 0 , 5) == "!rate") {
             $stars = $commentArray[1];
-            $featured = $commentArray[2];
-            
+            if(isset($commentArray[2])) {
+                $featured = $commentArray[2];
+            } else {
+                $featured = 0;
+            }
+
             $permsCheck = $ml->checkPerms(2, $udid);
 
             if($permsCheck == 1) {
