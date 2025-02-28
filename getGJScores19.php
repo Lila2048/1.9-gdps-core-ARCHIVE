@@ -65,14 +65,20 @@ if($type == "relative") {
     $sql->execute([':udid' => $udid]);
     $stars = $sql->fetchColumn();
 
+    # Get the overall rank of the user
+    $rankSql = $conn->prepare("SELECT COUNT(*) FROM users WHERE stars > :stars");
+    $rankSql->bindParam(":stars", $stars);
+    $rankSql->execute();
+    $rank = $rankSql->fetchColumn();
+
     $sql = $conn->prepare("(SELECT * FROM users WHERE stars <= :stars ORDER BY stars DESC LIMIT 50) UNION (SELECT * FROM users WHERE stars >= :stars ORDER BY stars ASC LIMIT 50) ORDER BY stars DESC");
     $sql->bindParam(":stars", $stars);
     $sql->execute();
     $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
     foreach($result as $user) {
-        $index++;
-        $userString .= "1:" . $user['userName'] . ":2:" . $user['userID'] . ":3:" . $user['stars'] . ":4:" . $user['demons'] . ":6:". $index . ":7:" . $user['accountID'] . ":8:" . $user['creatorPoints'] . ":9:" . $user['icon'] . ":10:" . $user['color1'] . ":11:" . $user['color2'] . ":13:" . $user['coins'] . ":14:" . $user['iconType']. ":15:" . $user['special'] . ":16:" . $user['accountID'] . "|";
+        $userString .= "1:" . $user['userName'] . ":2:" . $user['userID'] . ":3:" . $user['stars'] . ":4:" . $user['demons'] . ":6:". $rank . ":7:" . $user['accountID'] . ":8:" . $user['creatorPoints'] . ":9:" . $user['icon'] . ":10:" . $user['color1'] . ":11:" . $user['color2'] . ":13:" . $user['coins'] . ":14:" . $user['iconType']. ":15:" . $user['special'] . ":16:" . $user['accountID'] . "|";
+        $rank++;
     }
 
     $userString = rtrim($userString, "|");
