@@ -55,7 +55,6 @@ if($result == 0) {
     $coinsDiff = $coins;
 
     $sql = $conn->prepare("INSERT INTO users (udid, accountID, userName, stars, demons, color1, color2, iconType, coins, special, gameVersion, time, icon) VALUES (:udid, :accountID, :userName, :stars, :demons, :color1, :color2, :iconType, :coins, :special, :gameVersion, :time, :icon)");
-    $sql->bindParam(":udid", $udid);
 
 } else {
 
@@ -66,11 +65,11 @@ if($result == 0) {
     $coinsDiff = $coins - $oldData['coins'];
     $demonsDiff = $demons - $oldData['demons'];
 
-    $sql = $conn->prepare("UPDATE users SET accountID = :accountID, userName = :userName, stars = :stars, demons = :demons, color1 = :color1, color2 = :color2, iconType = :iconType, coins = :coins, special = :special, gameVersion = :gameVersion, time = :time, icon = :icon WHERE userID = :userID LIMIT 1");
-    $sql->bindParam(":userID", $userID);
+    $sql = $conn->prepare("UPDATE users SET accountID = :accountID, userName = :userName, stars = :stars, demons = :demons, color1 = :color1, color2 = :color2, iconType = :iconType, coins = :coins, special = :special, gameVersion = :gameVersion, time = :time, icon = :icon WHERE udid = :udid LIMIT 1");
 
 }
 
+$sql->bindParam(":udid", $udid);
 $sql->bindParam(":accountID", $accountID);
 $sql->bindParam(":userName", $userName);
 $sql->bindParam(":stars", $stars);
